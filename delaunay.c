@@ -2,15 +2,6 @@
 
 int _point_count = 0;
 
-vertex* _points_ex1 = NULL;
-/*vertex* _points_ex2 = NULL;
-vertex* _points_ex3 = NULL;
-vertex* _points_ex4 = NULL;
-
-vertex* _convex_ordonnes_ex1 = NULL;
-vertex* _convex_ordonnes_ex2 = NULL;
-vertex* _convex_ordonnes_ex3 = NULL;
-vertex* _convex_ordonnes_ex4 = NULL;*/
 
 // Exercice sélectionné
 char _opt_selex = 0;
@@ -23,22 +14,70 @@ double myRandom(double a, double b)
 
 void create_random_points()
 {
-  int i;
-
-  _points_ex1 = malloc(sizeof(*_points_ex1) * _point_count);
-
-  for (i = 0; i < _point_count; ++i)
-  {
-    vertex_init(&_points_ex1[i],
-		myRandom(MARGIN, WINDOW_WIDTH-MARGIN),
-		myRandom(MARGIN, WINDOW_HEIGHT-MARGIN));
-		myRandom(0,ALTITUDE_MAX);
-  }
-
-  /*_points_ex2 = vertex_copy(_points_ex1, _point_count);
-  _points_ex3 = vertex_copy(_points_ex1, _point_count);
-  _points_ex4 = vertex_copy(_points_ex1, _point_count);*/
+	assert(_point_count >=4);
+	
+	const int naturel = VLINK_NATURAL,	lexico = VLINK_LEXICO,	suiv = VLINK_FORWARD,	prec = VLINK_BACKWARD; 
+	//le prof a dit de ne pas utiliser un tableau de point mais une liste chainée
+	vertex* v = vertex_create(MARGIN, MARGIN, myRandom(0,ALTITUDE_MAX));	//c'est aussi le premier dans l'ordre lexicographique
+	premier = v;
+	vertex* vPrec = v;
+	
+	v = vertex_create(MARGIN, WINDOW_HEIGHT-MARGIN, myRandom(0,ALTITUDE_MAX));
+	vPrec->link[naturel][suiv] = v;
+	vPrec->link[lexico][suiv] = v;
+	vPrec = v;
+	
+	v = vertex_create(WINDOW_WIDTH-MARGIN, MARGIN, myRandom(0,ALTITUDE_MAX));
+	vPrec->link[naturel][suiv] = v;
+	vPrec->link[lexico][suiv] = v;
+	vPrec = v;
+	
+	v = vertex_create(WINDOW_WIDTH-MARGIN, WINDOW_HEIGHT-MARGIN, myRandom(0,ALTITUDE_MAX));
+	vPrec->link[naturel][suiv] = v;
+	vPrec->link[lexico][suiv] = v;
+	
+	
+	
+	int i; j;
+	int cmp;
+	vertex* v2 = v;
+	for (i = 4; i < _point_count; ++i)
+	{
+		/*v = vertex_create(
+				myRandom(MARGIN, WINDOW_WIDTH-MARGIN),
+				myRandom(MARGIN, WINDOW_HEIGHT-MARGIN);
+				myRandom(0,ALTITUDE_MAX));*/
+		v = vertex_create(0,0,myRandom(0,ALTITUDE_MAX));
+		v->link[natural][suiv] = v2;
+		
+		do
+		{
+			v->X = myRandom(MARGIN, WINDOW_WIDTH-MARGIN),
+			v->Y = myRandom(MARGIN, WINDOW_HEIGHT-MARGIN);
+			
+			vPrec = premier;
+			v2= vPrec->link[lexico][suiv];
+			while(v2 != NULL && (cmp = lexico_cmp(v2, v))== -1)
+			{
+				vPrec = v2;
+				v2 = v2->link[lexico][suiv];
+			}
+			
+			if(cmp != 0)	//si le vertex(x,y) n'est pas déjà dans la chaine	(-1 => v2==NULL)
+			{
+				vPrec->link[lexico][suiv] = v;
+				v->link[lexico][suiv] = v2;
+			}
+			//else: il faut changer les valeurs du vertex.
+		}
+		while(cmp == 0);	//tant que le vertex à les mêmes coordonnées (x,y) qu'un autre point
+	}
+	
+	chainageArriere(premier, naturel);
+	chainageArriere(premier, lexico);
 }
+
+
 
 void winInit()
 {
@@ -96,26 +135,13 @@ int main(int argc, char **argv)
 
 	switch (_opt_selex)
 	{
-		case '1': tpga4_ex1(); break;
-		case '2': tpga4_ex2(); break;
-		case '3': tpga4_ex3(); break;
-		case '4': tpga4_ex4(); break;
-	        case 'a':
-
-		  tpga4_ex1();
-		  tpga4_ex2();
-		  tpga4_ex3();
-		  tpga4_ex4();
-
-		  break;
+		default: draw();
 	}
 
 	glutMainLoop();
+	
+	//free(_points_ex1);
 
-	free(_points_ex1);
-	free(_points_ex2);
-	free(_points_ex3);
-	free(_points_ex4);
 
 	return EXIT_SUCCESS;
 }
@@ -127,7 +153,8 @@ void on_idle_event()
 
 void draw()
 {
-  glColor3f(0, 0, 0);
+}
+/*  glColor3f(0, 0, 0);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -196,25 +223,6 @@ void draw_points(const vertex* points, const unsigned int point_count)
   glEnd();
 }
 
-/*void draw_jarvis(const vertex* points, const unsigned int point_count, const int_list* hull_points)
-{
-  int hull_point;
-
-  // Rendu de l'enveloppe convexe
-  glBegin(GL_LINE_LOOP);
-
-  while (hull_points)
-  {
-    hull_point = hull_points->value;
-    glVertex2f(points[hull_point].X, points[hull_point].Y);
-    hull_points = hull_points->next;
-  }
-
-  glEnd();
-
-  // Rendu des points
-  draw_points(points, point_count);
-}*/
 
 #define drawVertex(v) glVertex2f( v->X, v->Y)
 
@@ -243,4 +251,4 @@ void draw_exercice(const vertex* points, const unsigned int point_count, const v
 
 	// Rendu des points
 	draw_points(points, point_count);
-}
+}*/

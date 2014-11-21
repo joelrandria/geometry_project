@@ -23,17 +23,12 @@ extern int opterr;
 // Variables globales communes initialisées au démarrage de l'application
 extern int _point_count;	// nombre de points défini en paramêtre avec l'option "-n"
 
-extern vertex* _points_ex1;	// copies des vertices pour l'exercice 1 (Jarvis)
-/*extern vertex* _points_ex2;	// copies des vertices pour l'exercice 2 (Graham)
-extern vertex* _points_ex3;	// copies des vertices pour l'exercice 3 (Insertion lexico)
-extern vertex* _points_ex4;	// copies des vertices pour l'exercice 4 (Divide & Conquer)
+//extern vertex* _points_ex1;	// copies des vertices pour l'exercice 1 (Jarvis)
+extern vertex* premier;	//pointeur vers le premier point chainé de la liste de points.
 
 // Variables globales initialisées spécifiquement par les différents exercices
 
 extern vertex* _convex_ordonnes_ex1;	// enveloppe convexe générée par l'exercice 1
-extern vertex* _convex_ordonnes_ex2;	// enveloppe convexe générée par l'exercice 2
-extern vertex* _convex_ordonnes_ex3;	// enveloppe convexe générée par l'exercice 3
-extern vertex* _convex_ordonnes_ex4;	// enveloppe convexe générée par l'exercice 4*/
 
 // Gestionnaires d'évènements
 void on_idle_event();

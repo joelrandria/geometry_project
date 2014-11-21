@@ -15,6 +15,7 @@ void vertex_init(vertex* v, double x, double y, double z)
     for (j = 0; j < VLINK_DIRECTION_COUNT; ++j)
       v->link[i][j] = 0;
 }
+
 vertex* vertex_create(double x, double y, double z)
 {
   vertex* v = malloc(sizeof(*v));
@@ -22,6 +23,13 @@ vertex* vertex_create(double x, double y, double z)
   vertex_init(v, x, y, z);
 
   return v;
+}
+
+void vertex_modif(vertex* v, double x, double y, double z)
+{
+  v->X = x;
+  v->Y = y;
+  v->Z = z;
 }
 
 /**état initial: le tableau de vertex de taille "count" ne contient que des linkages vers NULL*/

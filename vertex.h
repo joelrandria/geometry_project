@@ -16,11 +16,12 @@
 #define ORIENTATION_CCW		1		//counter clockwise: orientation polaire:	> 180 dans le sens des aiguille d'une montre
 
 // Liens inter vertices
-#define VLINK_TYPE_COUNT	4
+#define VLINK_TYPE_COUNT	5
 #define VLINK_NATURAL		0
 #define VLINK_POLAR		1
 #define VLINK_LEXICO		2
 #define VLINK_CONVEX		3
+#define VLINK_CANDIDAT		4
 
 #define VLINK_DIRECTION_COUNT	2
 #define VLINK_BACKWARD		0
@@ -36,6 +37,7 @@ typedef struct _vertex
 // Allocation / Initialisation / Copie
 void vertex_init(vertex* v, double x, double y, double z);
 vertex* vertex_create(double x, double y, double z);
+void vertex_modif(vertex* v, double x, double y, double z);
 vertex* vertex_copy(vertex* tab, int count);
 
 // Affichage
