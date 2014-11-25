@@ -39,6 +39,7 @@ void vertex_init(vertex* v, double x, double y, double z);
 vertex* vertex_create(double x, double y, double z);
 void vertex_modif(vertex* v, double x, double y, double z);
 vertex* vertex_copy(vertex* tab, int count);
+void vertex_delete(vertex* v, int vlink);
 
 // Affichage
 void vertex_print_all(vertex* v, int vlink, int vdirection);

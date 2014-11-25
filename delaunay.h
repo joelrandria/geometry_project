@@ -20,6 +20,7 @@ extern int opterr;
 
 // Options
 extern int _point_count;	// nombre de points défini en paramêtre avec l'option "-n"
+
 extern double _altitude_min;	// altitude minimum des sommets
 extern double _altitude_max;	// altitude maximum des sommets
 

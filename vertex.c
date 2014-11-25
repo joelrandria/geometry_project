@@ -1,5 +1,6 @@
 #include "vertex.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 void vertex_init(vertex* v, double x, double y, double z)
@@ -44,6 +45,18 @@ vertex* vertex_copy(vertex* tab, int count)
     copies[i] = tab[i];
 
   return copies;
+}
+
+void vertex_delete_rec(vertex* v, vertex* start, int vlink)
+{
+  if (v->link[vlink][VLINK_FORWARD] == NULL || v->link[vlink][VLINK_FORWARD] == start)
+    free(v);
+  else
+    vertex_delete_rec(v->link[vlink][VLINK_FORWARD], start, vlink);
+}
+void vertex_delete(vertex* v, int vlink)
+{
+  vertex_delete_rec(v, v, vlink);
 }
 
 //////////////////////////////////////////////////////////
@@ -189,4 +202,21 @@ vertex* chainageArriere(vertex* debList, const int type)
 		v->link[type][VLINK_BACKWARD] = v2;
 	
 	return debList;
+}
+
+void vertex_print_all(vertex* v, int vlink, int vdirection)
+{
+  vertex* start;
+
+  start = v;
+
+  while (v != NULL)
+  {
+    printf("x: %lf, y: %lf, z:%lf\r\n", v->X, v->Y, v->Z);
+
+    v = v->link[vlink][vdirection];
+
+    if (v == start)
+      break;
+  }
 }

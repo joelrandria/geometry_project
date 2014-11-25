@@ -40,6 +40,7 @@ void create_random_points()
 	v = vertex_create(1, 1, myRandom(_altitude_min, _altitude_max));
 	vPrec->link[naturel][suiv] = v;
 	vPrec->link[lexico][suiv] = v;
+	vertex* dernier = v;
 
 	int i;
 	int cmp;
@@ -51,7 +52,8 @@ void create_random_points()
 				myRandom(MARGIN, WINDOW_HEIGHT-MARGIN);
 				myRandom(0,_altitude_max));*/
 		v = vertex_create(0,0, myRandom(_altitude_min, _altitude_max));
-		v->link[naturel][suiv] = v2;
+		dernier->link[naturel][suiv] = v;
+		dernier = v;
 
 		do
 		{
@@ -84,7 +86,7 @@ void create_random_points()
 
 void winInit()
 {
-	gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+	gluOrtho2D(0, 1, 0, 1);
 }
 
 void usage()
@@ -104,6 +106,7 @@ int main(int argc, char **argv)
 		switch (c)
 		{
 			case 'n':
+
 				if ((sscanf(optarg, "%d", &_point_count) != 1) || _point_count <= 0)
 					_point_count = 50;
 				break;
@@ -118,16 +121,18 @@ int main(int argc, char **argv)
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutCreateWindow("Delaunay");
 	glutIdleFunc(on_idle_event);
+
 	glutDisplayFunc(draw);
 
 	winInit();
 
 	create_random_points();
 
+	vertex_print_all(premier, VLINK_NATURAL, VLINK_FORWARD);
+
 	glutMainLoop();
 
-	//free(_points_ex1);
-
+	vertex_delete(premier, VLINK_NATURAL);
 
 	return EXIT_SUCCESS;
 }
@@ -139,4 +144,23 @@ void on_idle_event()
 
 void draw()
 {
+  vertex* v;
+
+  glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+  glClearColor(0, 0, 0, 0);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glBegin(GL_POINTS);
+  glColor3f(1, 1, 1);
+
+  v = premier;
+  while (v != NULL)
+  {
+    glVertex3f(v->X, v->Y, v->Z);
+    v = v->link[VLINK_NATURAL][VLINK_FORWARD];
+  }
+
+  glEnd();
+  glFlush();
 }
