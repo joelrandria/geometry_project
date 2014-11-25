@@ -39,9 +39,9 @@ triangle* triangle_create2(vertex* v0, vertex* v1, vertex* v2)
 #define ALIGNE 0x11
 #define GAUCHE 0x01
 #define DROITE 0x10
-int cote(const vertex* p1, const vertex* p2, const vertex* p)
+int cote2d(const vertex* p1, const vertex* p2, const vertex* p)
 {
-	if(equal(p1,p2) || equal(p1,p) || equal(p2,p))
+	if(equal2d(p1,p2) || equal2d(p1,p) || equal2d(p2,p))
 		return ALIGNE;
 	
 	double e = (p2->Y-p1->Y)*(p->X-p2->X)-(p->Y-p2->Y)*(p2->X-p1->X);
@@ -52,7 +52,7 @@ int cote(const vertex* p1, const vertex* p2, const vertex* p)
 	else 			return ALIGNE;
 }
 
-int dansTriangle(const triangle* t, const vertex* p)
+int dansTriangle2d(const triangle* t, const vertex* p)
 {
 	int a = cote(t->s[0], t->s[1], p),
 		b = cote(t->s[1], t->s[2], p);

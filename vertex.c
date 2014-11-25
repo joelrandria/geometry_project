@@ -48,7 +48,7 @@ vertex* vertex_copy(vertex* tab, int count)
 
 //////////////////////////////////////////////////////////
 
-int equal(const vertex* a, const vertex* b)
+int equal2d(const vertex* a, const vertex* b)
 {
 	return (a->X == b->X && a->Y == b->Y);
 }
@@ -65,7 +65,7 @@ double vertex_distance(const vertex* v1, const vertex* v2)
 }
 double vertex_distance3d(const vertex* v1, const vertex* v2)
 {
-  return sqrt(pow((v2->X - v1->X), 2) + pow((v2->Y - v1->Y), 2) + pow((v2->Z - v1->Z), 2);
+  return sqrt(pow((v2->X - v1->X), 2) + pow((v2->Y - v1->Y), 2) + pow((v2->Z - v1->Z), 2));
 }
 
 /**
