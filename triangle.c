@@ -1,12 +1,14 @@
 #include "triangle.h"
 
-/*void triangle_init_candidat(triangle* t)
+#include <math.h>
+
+void triangle_init(triangle* t, vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2)
 {
 	const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
 	t->candidats = t->s[0];
 	t->s[0]->link[candidat][suiv] = t->s[1];
 	t->s[1]->link[candidat][suiv] = t->s[2];
-}*/
+}
 
 void triangle_init(triangle* t,
 				   vertex* v0, vertex* v1, vertex* v2,
@@ -36,7 +38,8 @@ void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2)
 	//triangle_init_candidat(t);
 }
 
-triangle* triangle_create(vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2)
+triangle* triangle_create(vertex* v0, vertex* v1, vertex* v2,
+			  triangle* voisin0, triangle* voisin1, triangle* voisin2)
 {
   triangle* t = malloc(sizeof(*t));
 
@@ -49,7 +52,6 @@ triangle* triangle_create2(vertex* v0, vertex* v1, vertex* v2)
   return triangle_create(v0, v1, v2, NULL, NULL, NULL);
 }
 
-//Joel, si tu préfère ton propre code, prend le.
 #define ALIGNE 0x11
 #define GAUCHE 0x01
 #define DROITE 0x10
@@ -82,11 +84,34 @@ int dansTriangle2d(const triangle* t, const vertex* p)
 		}
 	}
 	return 0;
-}	
+}
 
-double plane_vertical_distance(triangle* t, vertex* v)
+double triangle_vertical_distance(triangle* t, vertex* v)
 {
-	return fabs(1);
+  // Normale (non unitaire) au plan contenant t
+  double nX;
+  double nY;
+  double nZ;
+
+  // Altitude de la projection verticale de v sur le plan contenant t
+  double vProjZ;
+
+  nX = ((t->s[1]->Y - t->s[0]->Y) * (t->s[2]->Z - t->s[0]->Z))
+	- ((t->s[1]->Z - t->s[0]->Z) * (t->s[2]->Y - t->s[0]->Y));
+  nY = ((t->s[1]->Z - t->s[0]->Z) * (t->s[2]->X - t->s[0]->X))
+	- ((t->s[1]->X - t->s[0]->X) * (t->s[2]->Z - t->s[0]->Z));
+  nZ = ((t->s[1]->X - t->s[0]->X) * (t->s[2]->Y - t->s[0]->Y))
+	- ((t->s[1]->Y - t->s[0]->Y) * (t->s[2]->X - t->s[0]->X));
+
+  if (!nZ)
+  {
+    // Erreur d'implémentation: Le maillage n'est pas 2,5 D !
+    exit(-1);
+  }
+
+  vProjZ = (((t->s[0]->X - v->X) * nX) + ((t->s[0]->Y - v->Y) * nY) + (t->s[0]->Z * nZ)) / nZ;
+
+  return (fabs(v->Z - vProjZ));
 }
 
 /**le triangle a déjà au moins ses trois sommets comme candidats*/
