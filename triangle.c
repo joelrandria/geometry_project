@@ -1,25 +1,39 @@
 #include "triangle.h"
 
-void triangle_init(triangle* t, vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2)
+/*void triangle_init_candidat(triangle* t)
 {
-  t[0] = v0;
-  t[1] = v1;
-  t[2] = v2;
-  
-  v[0] = voisin0;
-  v[1] = voisin1;
-  v[2] = voisin2;
+	const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
+	t->candidats = t->s[0];
+	t->s[0]->link[candidat][suiv] = t->s[1];
+	t->s[1]->link[candidat][suiv] = t->s[2];
+}*/
+
+void triangle_init(triangle* t,
+				   vertex* v0, vertex* v1, vertex* v2,
+				   triangle* voisin0, triangle* voisin1, triangle* voisin2)
+{
+	t->s[0] = v0;
+	t->s[1] = v1;
+	t->s[2] = v2;
+
+	t->v[0] = voisin0;
+	t->v[1] = voisin1;
+	t->v[2] = voisin2;
+
+	//triangle_init_candidat(t);
 }
 void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2)
 {
-  t[0] = v0;
-  t[1] = v1;
-  t[2] = v2;
-  
-  
-  v[0] = NULL;
-  v[1] = NULL;
-  v[2] = NULL;
+	t->s[0] = v0;
+	t->s[1] = v1;
+	t->s[2] = v2;
+
+
+	t->v[0] = NULL;
+	t->v[1] = NULL;
+	t->v[2] = NULL;
+
+	//triangle_init_candidat(t);
 }
 
 triangle* triangle_create(vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2)
@@ -69,3 +83,25 @@ int dansTriangle2d(const triangle* t, const vertex* p)
 	}
 	return 0;
 }	
+
+double plane_vertical_distance(triangle* t, vertex* v)
+{
+	return fabs(1);
+}
+
+/**le triangle a déjà au moins ses trois sommets comme candidats*/
+triangle* ajouteCandidat(triangle* t, vertex* v)
+{
+	const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
+	if(plane_vertical_distance(t, v) > plane_vertical_distance(t, t->candidats))
+	{
+		v->link[candidat][suiv] = t->candidats);
+		t->candidats = v;
+	}
+	else
+	{
+		v->link[candidat][suiv] = t->candidats->link[candidat][suiv];
+		t->candidats->link[candidat][suiv] = v;
+	}
+	return t;
+}

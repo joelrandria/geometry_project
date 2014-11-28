@@ -128,7 +128,8 @@ int main(int argc, char **argv)
 
 	create_random_points();
 
-	vertex_print_all(premier, VLINK_NATURAL, VLINK_FORWARD);
+	vertex_print_all(premier, VLINK_LEXICO, VLINK_FORWARD);
+	//triangle* tgls = algo();
 
 	glutMainLoop();
 
@@ -151,12 +152,15 @@ void draw()
   glClearColor(0, 0, 0, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glPointSize(3);
   glBegin(GL_POINTS);
-  glColor3f(1, 1, 1);
 
   v = premier;
+  float val;
   while (v != NULL)
   {
+	  val = (v->Z-_altitude_min)/(_altitude_max-_altitude_min);
+	  glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
     glVertex3f(v->X, v->Y, v->Z);
     v = v->link[VLINK_NATURAL][VLINK_FORWARD];
   }

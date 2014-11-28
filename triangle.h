@@ -16,6 +16,8 @@ void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2);
 triangle* triangle_create(vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2);
 triangle* triangle_create2(vertex* v0, vertex* v1, vertex* v2);
 
+int dansTriangle2d(const triangle* t, const vertex* p);
 double plane_vertical_distance(triangle* t, vertex* v);
+triangle* ajouteCandidat(triangle* t, vertex* v);
 
 #endif
