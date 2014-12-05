@@ -1,4 +1,5 @@
 #include "delaunay.h"
+#include "pqueue.h"
 
 // Initialisation des variables externes
 int _point_count = 0;
