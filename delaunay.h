@@ -6,8 +6,13 @@
 #include <assert.h>
 #include <math.h>
 #include <unistd.h>
-#include <GL/glut.h>
 #include <string.h>
+
+#ifdef __LINUX__
+#include <GL/glut.h>
+#elif __APPLE__
+#include <GLUT/glut.h>
+#endif
 
 #include "vertex.h"
 #include "construction.h"

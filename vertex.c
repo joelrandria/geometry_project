@@ -106,13 +106,13 @@ int lexico_cmp(const vertex* a, const vertex* b)
   }
   return 1;
 }
-int lexico_min(const vertex* points, const uint point_count)
+int lexico_min(const vertex* points, const unsigned int point_count)
 {
   if (point_count <= 0)
     return -1;
 
   int min = 0;
-  uint i;
+  unsigned int i;
   for (i = 1; i < point_count; ++i)
     if (lexico_cmp(&points[i], &points[min]) < 0)
       min = i;
@@ -133,12 +133,12 @@ int orientation(const vertex* a, const vertex* b, const vertex* c)
 }
 
 
-int local_polar_min(const vertex* points, const uint point_count, int point)
+int local_polar_min(const vertex* points, const unsigned int point_count, int point)
 {
   if (point_count == 0)
     return -1;
 
-  uint i;
+  unsigned int i;
   int local_polar_min;
   int current_point_orientation;
 
