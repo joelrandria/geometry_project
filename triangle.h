@@ -20,6 +20,9 @@ triangle* triangle_create2(vertex* v0, vertex* v1, vertex* v2);
 
 int dansTriangle2d(const triangle* t, const vertex* p);
 double triangle_vertical_distance(triangle* t, vertex* v);
-triangle* ajouteCandidat(triangle* t, vertex* v);
+double ajouteCandidat(triangle* t, vertex* v);
+
+double triangle_vertical_distance(triangle* t, vertex* v);
+
 
 #endif
