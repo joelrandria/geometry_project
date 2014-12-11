@@ -22,11 +22,13 @@ endif
 job: delaunay #dox
 
 delaunay:	vertex.o \
-		delaunay.o
+		delaunay.o \
+		pqueue.o
 
 	$(CC) $(GL_LIBDIR) \
 		vertex.o \
 		delaunay.o \
+		pqueue.o \
 	$(GL_LIBRARIES) -o $@
 
 clean:
