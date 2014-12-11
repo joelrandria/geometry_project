@@ -15,8 +15,14 @@ typedef struct _pqueue
 pqueue* pqueue_create(int capacity);
 void pqueue_delete(pqueue* q);
 
+/*! Affichage */
+void pqueue_print(pqueue* q);
+
 /*! Modifications */
 void pqueue_enqueue(pqueue* q, triangle* t);
 triangle* pqueue_dequeue(pqueue* q);
+
+/*! Tests */
+void pqueue_tests();
 
 #endif
