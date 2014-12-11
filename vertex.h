@@ -49,8 +49,10 @@ vertex* vertex_at(vertex* v, int position, int vlink, int direction);
 vertex* vertex_insert(vertex* ref, vertex* nouv, int link, int direction);
 
 // Distances
-int equal(const vertex* a, const vertex* b);
+int equal2d(const vertex* a, const vertex* b);
+int equal3d(const vertex* a, const vertex* b);
 double vertex_distance(const vertex* v1, const vertex* v2);
+double vertex_distance3d(const vertex* v1, const vertex* v2);
 double square_distance_eucl(const vertex* a, const vertex* b);
 
 // Relation d'ordre lexicographique

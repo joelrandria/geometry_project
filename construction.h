@@ -2,7 +2,9 @@
 #define __CONSTRUCTION_H__
 
 #include "triangle.h"
+#include "delaunay.h"
+#include <assert.h>
 
-triangle* algo();
+triangle** algo();
 
 #endif

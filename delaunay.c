@@ -129,8 +129,24 @@ int main(int argc, char **argv)
 
 	create_random_points();
 
-	vertex_print_all(premier, VLINK_LEXICO, VLINK_FORWARD);
-	//triangle* tgls = algo();
+	//vertex_print_all(premier, VLINK_LEXICO, VLINK_FORWARD);
+	triangle** tgls = algo();
+	//vertex_print_all(tgls[0]->candidats, VLINK_CANDIDAT, VLINK_FORWARD);
+	vertex* v = tgls[0]->candidats;
+	while (v != NULL)
+	{
+		printf("hauteur: %lf, x: %lf, y: %lf, z:%lf\r\n", triangle_vertical_distance(tgls[0], v), v->X, v->Y, v->Z);
+		v = v->link[VLINK_CANDIDAT][VLINK_FORWARD];
+	}
+	printf("\n");
+	
+	//vertex_print_all(tgls[1]->candidats, VLINK_CANDIDAT, VLINK_FORWARD);
+	v = tgls[1]->candidats;
+	while (v != NULL)
+	{
+		printf("hauteur: %lf, x: %lf, y: %lf, z:%lf\r\n", triangle_vertical_distance(tgls[1], v), v->X, v->Y, v->Z);
+		v = v->link[VLINK_CANDIDAT][VLINK_FORWARD];
+	}
 
 	glutMainLoop();
 

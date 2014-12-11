@@ -2,13 +2,13 @@
 
 #include <math.h>
 
-void triangle_init(triangle* t, vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2)
+/*void triangle_init_candidat(triangle* t, vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2)
 {
 	const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
 	t->candidats = t->s[0];
 	t->s[0]->link[candidat][suiv] = t->s[1];
 	t->s[1]->link[candidat][suiv] = t->s[2];
-}
+}*/
 
 void triangle_init(triangle* t,
 				   vertex* v0, vertex* v1, vertex* v2,
@@ -21,8 +21,10 @@ void triangle_init(triangle* t,
 	t->v[0] = voisin0;
 	t->v[1] = voisin1;
 	t->v[2] = voisin2;
+	
+	t->candidats = NULL;
 
-	//triangle_init_candidat(t);
+	t->distance_max = 0;
 }
 void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2)
 {
@@ -34,8 +36,10 @@ void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2)
 	t->v[0] = NULL;
 	t->v[1] = NULL;
 	t->v[2] = NULL;
+	
+	t->candidats = NULL;
 
-	//triangle_init_candidat(t);
+	t->distance_max = 0;
 }
 
 triangle* triangle_create(vertex* v0, vertex* v1, vertex* v2,
@@ -70,11 +74,11 @@ int cote2d(const vertex* p1, const vertex* p2, const vertex* p)
 
 int dansTriangle2d(const triangle* t, const vertex* p)
 {
-	int a = cote(t->s[0], t->s[1], p),
-		b = cote(t->s[1], t->s[2], p);
+	int a = cote2d(t->s[0], t->s[1], p),
+		b = cote2d(t->s[1], t->s[2], p);
 	if( (a & b))
 	{
-		int c = cote(t->s[2], t->s[0], p);
+		int c = cote2d(t->s[2], t->s[0], p);
 		if((b & c) && (a & c))	//a et b sont orientés du même côté avec "c". Cela marche aussi si les points sont alignés.
 		{
 			if(a == ALIGNE || b == ALIGNE || c == ALIGNE)
@@ -84,6 +88,11 @@ int dansTriangle2d(const triangle* t, const vertex* p)
 		}
 	}
 	return 0;
+}
+
+void test2(const int i)
+{
+	printf("test %d\n", i);
 }
 
 double triangle_vertical_distance(triangle* t, vertex* v)
@@ -115,18 +124,27 @@ double triangle_vertical_distance(triangle* t, vertex* v)
 }
 
 /**le triangle a déjà au moins ses trois sommets comme candidats*/
-triangle* ajouteCandidat(triangle* t, vertex* v)
+double ajouteCandidat(triangle* t, vertex* v)
 {
-	const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
-	if(plane_vertical_distance(t, v) > plane_vertical_distance(t, t->candidats))
+	const int candidat = VLINK_CANDIDAT, suiv = VLINK_FORWARD;
+	const double distV = triangle_vertical_distance(t, v);
+
+	if(t->candidats == NULL)
 	{
-		v->link[candidat][suiv] = t->candidats);
 		t->candidats = v;
+		return distV;
+	}
+	const double distC = triangle_vertical_distance(t, t->candidats);
+	if(distV > distC)
+	{
+		v->link[candidat][suiv] = t->candidats;
+		t->candidats = v;
+		return distV;
 	}
 	else
 	{
 		v->link[candidat][suiv] = t->candidats->link[candidat][suiv];
 		t->candidats->link[candidat][suiv] = v;
+		return distC;
 	}
-	return t;
 }

@@ -5,9 +5,11 @@
 /*! Structure pour representer un triangle. */
 typedef struct _triangle
 {
-  struct _vertex* s[3];		//sommets du triangle
-  struct _triangle* v[3];	//triangles voisins
-  struct _vertex* candidats;	//liste des points dans le triangle (x,y) avec VLINK_CANDIDAT.
+  struct _vertex* s[3];		// sommets du triangle
+  struct _triangle* v[3];	// triangles voisins
+
+  struct _vertex* candidats;	// liste des points dans le triangle (x,y) avec VLINK_CANDIDAT.
+  double distance_max;		// distance du candidat du triangle, le plus loin verticalement
 } triangle;
 
 void triangle_init(triangle* t, vertex* v0, vertex* v1, vertex* v2,
@@ -20,6 +22,9 @@ triangle* triangle_create2(vertex* v0, vertex* v1, vertex* v2);
 
 int dansTriangle2d(const triangle* t, const vertex* p);
 double triangle_vertical_distance(triangle* t, vertex* v);
-triangle* ajouteCandidat(triangle* t, vertex* v);
+double ajouteCandidat(triangle* t, vertex* v);
+
+double triangle_vertical_distance(triangle* t, vertex* v);
+
 
 #endif

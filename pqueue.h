@@ -16,7 +16,7 @@ pqueue* pqueue_create(int capacity);
 void pqueue_delete(pqueue* q);
 
 /*! Modifications */
-void pqueue_enqueue(triangle* t);
-triangle* pqueue_dequeue();
+void pqueue_enqueue(pqueue* q, triangle* t);
+triangle* pqueue_dequeue(pqueue* q);
 
 #endif
