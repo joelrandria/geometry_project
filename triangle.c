@@ -1,6 +1,7 @@
 #include "triangle.h"
 
 #include <math.h>
+#include <stdio.h>
 
 /*void triangle_init_candidat(triangle* t, vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2)
 {
@@ -21,9 +22,8 @@ void triangle_init(triangle* t,
 	t->v[0] = voisin0;
 	t->v[1] = voisin1;
 	t->v[2] = voisin2;
-	
-	t->candidats = NULL;
 
+	t->candidats = NULL;
 	t->distance_max = 0;
 }
 void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2)
@@ -36,7 +36,7 @@ void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2)
 	t->v[0] = NULL;
 	t->v[1] = NULL;
 	t->v[2] = NULL;
-	
+
 	t->candidats = NULL;
 
 	t->distance_max = 0;
@@ -63,10 +63,10 @@ int cote2d(const vertex* p1, const vertex* p2, const vertex* p)
 {
 	if(equal2d(p1,p2) || equal2d(p1,p) || equal2d(p2,p))
 		return ALIGNE;
-	
+
 	double e = (p2->Y-p1->Y)*(p->X-p2->X)-(p->Y-p2->Y)*(p2->X-p1->X);
 	//printf("%f\n", e);
-	
+
 	if(e < 0) 		return DROITE;
 	else if(e > 0)	return GAUCHE;
 	else 			return ALIGNE;
@@ -105,16 +105,13 @@ double triangle_vertical_distance(triangle* t, vertex* v)
   // Altitude de la projection verticale de v sur le plan contenant t
   double vProjZ;
 
-  nX = ((t->s[1]->Y - t->s[0]->Y) * (t->s[2]->Z - t->s[0]->Z))
-	- ((t->s[1]->Z - t->s[0]->Z) * (t->s[2]->Y - t->s[0]->Y));
-  nY = ((t->s[1]->Z - t->s[0]->Z) * (t->s[2]->X - t->s[0]->X))
-	- ((t->s[1]->X - t->s[0]->X) * (t->s[2]->Z - t->s[0]->Z));
-  nZ = ((t->s[1]->X - t->s[0]->X) * (t->s[2]->Y - t->s[0]->Y))
-	- ((t->s[1]->Y - t->s[0]->Y) * (t->s[2]->X - t->s[0]->X));
+  nX = ((t->s[1]->Y - t->s[0]->Y) * (t->s[2]->Z - t->s[0]->Z)) - ((t->s[1]->Z - t->s[0]->Z) * (t->s[2]->Y - t->s[0]->Y));
+  nY = ((t->s[1]->Z - t->s[0]->Z) * (t->s[2]->X - t->s[0]->X)) - ((t->s[1]->X - t->s[0]->X) * (t->s[2]->Z - t->s[0]->Z));
+  nZ = ((t->s[1]->X - t->s[0]->X) * (t->s[2]->Y - t->s[0]->Y)) - ((t->s[1]->Y - t->s[0]->Y) * (t->s[2]->X - t->s[0]->X));
 
   if (!nZ)
   {
-    // Erreur d'implémentation: Le maillage n'est pas 2,5 D !
+    fprintf(stderr, "triangle_vertical_distance(): Erreur: Nz = %f ! Fin du programme\r\n", nZ);
     exit(-1);
   }
 
@@ -147,4 +144,17 @@ double ajouteCandidat(triangle* t, vertex* v)
 		t->candidats->link[candidat][suiv] = v;
 		return distC;
 	}
+}
+
+void triangle_tests()
+{
+  triangle* t;
+
+  printf("-------- Tests unitaires de la structure triangle --------\r\n");
+
+  t = triangle_create(vertex_create(0, 0, 0), vertex_create(-1, 1, 1), vertex_create(1, 1, 1), NULL, NULL, NULL);
+
+  printf("distance = %f\r\n", triangle_vertical_distance(t, vertex_create(0, 0, 2)));
+
+  printf("----------------------------------------------------------\r\n");
 }
