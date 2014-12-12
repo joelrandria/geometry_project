@@ -134,8 +134,18 @@ int main(int argc, char **argv)
 
 	_queue = pqueue_create(2*_point_count-6);
 	initCarre(premier, _queue);
-	insertPoint(_queue);
-	insertPoint(_queue);
+	while(insertPoint(_queue));
+	
+	/*while(_queue->size > 1)
+	{
+		pqueue_dequeue(_queue);
+	}
+	printf("\n");
+	printf("nb : %d\n", _queue->size);*/
+	/*for(int i = 0;	i < 3;	i++)
+		printf("x: %lf, y: %lf, z:%lf\r\n", 
+		_queue->items[1]->s[i]->X, _queue->items[1]->s[i]->Y, _queue->items[1]->s[i]->Z);
+	*/
 	//vertex_print_all(premier, VLINK_LEXICO, VLINK_FORWARD);
 	/*triangle** tgls = algo();
 	//vertex_print_all(tgls[0]->candidats, VLINK_CANDIDAT, VLINK_FORWARD);
@@ -181,7 +191,7 @@ void draw()
 
 	//printf("nb = %d\n" , _queue->size);
 	glPointSize(3);
-	for(int i = 1;	i < _queue->size;	i++)
+	for(int i = 1;	i <= _queue->size;	i++)
 	{
 		glBegin(GL_LINE_LOOP);
 		t = _queue->items[i];

@@ -12,7 +12,7 @@ int insertPoint(pqueue* pq)
 {
 	triangle* t = pqueue_dequeue(pq);
 	creerTroisTriangles(t, pq);
-	return 1;
+	return (pq->items[1]->candidats != NULL);
 }
 
 void initCarre(vertex* premier, pqueue* pq)
