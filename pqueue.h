@@ -13,14 +13,14 @@ typedef struct _pqueue
 
 /*! Allocation / Destruction */
 pqueue* pqueue_create(int capacity);
-void pqueue_delete(pqueue* q);
+void pqueue_delete(pqueue* q);	//free/delete
 
 /*! Affichage */
 void pqueue_print(pqueue* q);
 
 /*! Modifications */
-void pqueue_enqueue(pqueue* q, triangle* t);
-triangle* pqueue_dequeue(pqueue* q);
+void pqueue_enqueue(pqueue* q, triangle* t);	//ajouté dans la queue
+triangle* pqueue_dequeue(pqueue* q);			//retire l'élément de priorité maximum et le retourne
 
 /*! Tests */
 void pqueue_tests();
