@@ -38,7 +38,6 @@ void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2)
 	t->v[2] = NULL;
 
 	t->candidats = NULL;
-
 	t->distance_max = 0;
 }
 
@@ -129,13 +128,15 @@ double ajouteCandidat(triangle* t, vertex* v)
 	if(t->candidats == NULL)
 	{
 		t->candidats = v;
+		t->distance_max = distV;
 		return distV;
 	}
-	const double distC = triangle_vertical_distance(t, t->candidats);
+	const double distC = t->distance_max;	//triangle_vertical_distance(t, t->candidats);
 	if(distV > distC)
 	{
 		v->link[candidat][suiv] = t->candidats;
 		t->candidats = v;
+		t->distance_max = distV;
 		return distV;
 	}
 	else

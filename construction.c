@@ -4,7 +4,18 @@ void test(const int i)
 {
 	printf("test %d\n", i);
 }
-triangle** algo()
+
+
+/**
+ * retourne s'il n'y a plus de point à ajouter*/
+int insertPoint(pqueue* pq)
+{
+	triangle* t = pqueue_dequeue(pq);
+	creerTroisTriangles(t, pq);
+	return 1;
+}
+
+void initCarre(vertex* premier, pqueue* pq)
 {
 	assert(premier != NULL);
 	const int naturel = VLINK_NATURAL,	suiv = VLINK_FORWARD;
@@ -16,8 +27,6 @@ triangle** algo()
 	tgls[1] = triangle_create2(v2, v3->link[naturel][suiv], v3);
 	tgls[0]->v[0] = tgls[1];
 	tgls[1]->v[2] = tgls[0];
-	
-	//double prio0 = 0, prio1 = 0;
 	
 	v = v3->link[naturel][suiv]->link[naturel][suiv];	//v pointe vers le premier vertex qui n'ai pas un sommet du carré
 	while(v != NULL)
@@ -43,7 +52,9 @@ triangle** algo()
 		v = v->link[naturel][suiv];
 	}
 	
-	return tgls;
+	pqueue_enqueue(pq, tgls[0]);
+	pqueue_enqueue(pq, tgls[1]);
+	free(tgls);
 }
 
 int repartage(triangle* t, vertex* v)
@@ -80,7 +91,7 @@ void repartageCandidats(triangle** tgls, triangle* tdeb)
 }
 
 /**créer trois triangles en découpant un triangle par son premier candidat*/
-triangle** creerTroisTriangles(triangle* t)
+void creerTroisTriangles(triangle* t, pqueue* pq)
 {
 	triangle** tgls = (triangle**) malloc(sizeof(triangle*)*3);
 	vertex* v = t->candidats;
@@ -92,7 +103,11 @@ triangle** creerTroisTriangles(triangle* t)
 	tgls[0]->v[1] = tgls[2];
 	tgls[1]->v[1] = tgls[2];
 	
+	t->candidats = t->candidats->link[VLINK_CANDIDAT][VLINK_FORWARD];
 	repartageCandidats(tgls, t);
 	
-	return tgls;
+	pqueue_enqueue(pq, tgls[0]);
+	pqueue_enqueue(pq, tgls[1]);
+	pqueue_enqueue(pq, tgls[2]);
+	free(tgls);
 }

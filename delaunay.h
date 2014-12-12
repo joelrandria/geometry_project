@@ -14,7 +14,9 @@
 #include <GLUT/glut.h>
 #endif
 
+
 #include "vertex.h"
+#include "pqueue.h"
 #include "construction.h"
 
 #define WINDOW_WIDTH 768
@@ -31,7 +33,8 @@ extern double _altitude_min;	// altitude minimum des sommets
 extern double _altitude_max;	// altitude maximum des sommets
 
 // Variables globales
-extern vertex* premier;		// pointeur vers le premier point chainé de la liste de points
+//extern vertex* premier;		// pointeur vers le premier point chainé de la liste de points
+extern pqueue* _queue;
 
 // Gestionnaires d'évènements
 void on_idle_event();

@@ -7,7 +7,8 @@ int _point_count = 0;
 double _altitude_min = 0.0f;
 double _altitude_max = 0.5f;
 
-vertex* premier = NULL;
+//vertex* premier = NULL;
+pqueue* _queue = NULL;
 
 double myRandom(double a, double b)
 {
@@ -15,7 +16,7 @@ double myRandom(double a, double b)
 	return (a + tmp * ((b - a) / RAND_MAX));
 }
 
-void create_random_points()
+vertex* create_random_points()
 {
 	assert(_point_count >=4);
 
@@ -25,7 +26,7 @@ void create_random_points()
 
 	// Vertices du carré ]0,1[² dans l'ordre lexicographique
 	vertex* v = vertex_create(0, 0, myRandom(_altitude_min, _altitude_max));
-	premier = v;
+	vertex* premier = v;
 	vertex* vPrec = v;
 
 	v = vertex_create(0, 1, myRandom(_altitude_min, _altitude_max));
@@ -81,6 +82,8 @@ void create_random_points()
 
 	chainageArriere(premier, naturel);
 	chainageArriere(premier, lexico);
+	
+	return premier;
 }
 
 
@@ -127,10 +130,14 @@ int main(int argc, char **argv)
 
 	winInit();
 
-	create_random_points();
+	vertex* premier = create_random_points();
 
+	_queue = pqueue_create(2*_point_count-6);
+	initCarre(premier, _queue);
+	insertPoint(_queue);
+	insertPoint(_queue);
 	//vertex_print_all(premier, VLINK_LEXICO, VLINK_FORWARD);
-	triangle** tgls = algo();
+	/*triangle** tgls = algo();
 	//vertex_print_all(tgls[0]->candidats, VLINK_CANDIDAT, VLINK_FORWARD);
 	vertex* v = tgls[0]->candidats;
 	while (v != NULL)
@@ -146,11 +153,12 @@ int main(int argc, char **argv)
 	{
 		printf("hauteur: %lf, x: %lf, y: %lf, z:%lf\r\n", triangle_vertical_distance(tgls[1], v), v->X, v->Y, v->Z);
 		v = v->link[VLINK_CANDIDAT][VLINK_FORWARD];
-	}
+	}*/
 
 	glutMainLoop();
 
 	vertex_delete(premier, VLINK_NATURAL);
+	pqueue_delete(_queue);
 
 	return EXIT_SUCCESS;
 }
@@ -162,26 +170,43 @@ void on_idle_event()
 
 void draw()
 {
-  vertex* v;
+	
+	vertex* v;
+	triangle* t;
+	float val;
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-  glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glClearColor(0, 0, 0, 0);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	//printf("nb = %d\n" , _queue->size);
 	glPointSize(3);
-  glBegin(GL_POINTS);
+	for(int i = 1;	i < _queue->size;	i++)
+	{
+		glBegin(GL_LINE_STRIP);
+		t = _queue->items[i];
+		for(int j = 0;	j < 3;	j++)
+		{
+			v = t->s[j];
+			val = (v->Z-_altitude_min)/(_altitude_max-_altitude_min);
+			glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
+			glVertex3f(v->X, v->Y, v->Z);
+		}
+	}
 
-  v = premier;
-  float val;
-  while (v != NULL)
-  {
-	  val = (v->Z-_altitude_min)/(_altitude_max-_altitude_min);
-	  glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
-    glVertex3f(v->X, v->Y, v->Z);
-    v = v->link[VLINK_NATURAL][VLINK_FORWARD];
-  }
+	
+	/*glBegin(GL_POINTS);
 
-  glEnd();
-  glFlush();
+	v = premier;
+	float val;
+	while (v != NULL)
+	{
+		val = (v->Z-_altitude_min)/(_altitude_max-_altitude_min);
+		glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
+		glVertex3f(v->X, v->Y, v->Z);
+		v = v->link[VLINK_NATURAL][VLINK_FORWARD];
+	}*/
+
+	glEnd();
+	glFlush();
 }
