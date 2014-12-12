@@ -183,7 +183,7 @@ void draw()
 	glPointSize(3);
 	for(int i = 1;	i < _queue->size;	i++)
 	{
-		glBegin(GL_LINE_STRIP);
+		glBegin(GL_LINE_LOOP);
 		t = _queue->items[i];
 		for(int j = 0;	j < 3;	j++)
 		{
@@ -191,7 +191,8 @@ void draw()
 			val = (v->Z-_altitude_min)/(_altitude_max-_altitude_min);
 			glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
 			glVertex3f(v->X, v->Y, v->Z);
-		}
+		}		
+		glEnd();	
 	}
 
 	
@@ -207,6 +208,5 @@ void draw()
 		v = v->link[VLINK_NATURAL][VLINK_FORWARD];
 	}*/
 
-	glEnd();
 	glFlush();
 }
