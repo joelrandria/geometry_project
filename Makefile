@@ -25,7 +25,8 @@ delaunay:	vertex.o \
 		delaunay.o \
                 construction.o \
 		triangle.o \
-                pqueue.o
+                pqueue.o \
+		tstack.o
 
 	$(CC) $(GL_INCLUDE) $(GL_LIBDIR) \
 		vertex.o \
@@ -33,8 +34,9 @@ delaunay:	vertex.o \
                 construction.o \
 		triangle.o \
                 pqueue.o \
+		tstack.o \
 	$(GL_LIBRARIES) -D$(OS) -o $@
-	
+
 delaunay.o: delaunay.c
 
 		$(CC) $(GL_INCLUDE) $(CFLAGS) -D$(OS) $<
