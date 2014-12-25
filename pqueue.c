@@ -29,10 +29,33 @@ void pqueue_print(pqueue* q)
 
   printf("---------------------------\r\n");
   for (i = 1; i <= q->size; ++i)
-    printf("[%d]: %f\r\n", i, q->items[i]->distance_max);
+    printf("[%d]: distance=%f, queue_pos=%d\r\n",
+	   i,
+	   q->items[i]->distance_max,
+	   q->items[i]->queue_pos);
   printf("---------------------------\r\n");
 }
 
+/**
+ * Affecte le triangle spécifié à la position spécifiée de la file de priorité.\n
+ * Prend en charge l'affectation du champ @queue_pos du triangle.
+ *
+ * @param q La file de priorité.
+ * @param pos La position à laquelle doit être placée le triangle.
+ * @param t Le triangle.
+ */
+static void pqueue_set(pqueue* q, int pos, triangle* t)
+{
+  q->items[pos] = t;
+  t->queue_pos = pos;
+}
+/**
+ * Intervertit deux triangles de la file de priorité spécifiée.
+ *
+ * @param q La file de priorité.
+ * @param pos1 La position du premier triangle à intervertir.
+ * @param pos2 La position du second triangle à intervertir.
+ */
 static void pqueue_swap(pqueue* q, int pos1, int pos2)
 {
   triangle* temp;
@@ -41,8 +64,9 @@ static void pqueue_swap(pqueue* q, int pos1, int pos2)
   assert(pos2 >= 1 && pos2 <= q->size);
 
   temp = q->items[pos1];
-  q->items[pos1] = q->items[pos2];
-  q->items[pos2] = temp;
+
+  pqueue_set(q, pos1, q->items[pos2]);
+  pqueue_set(q, pos2, temp);
 }
 void pqueue_enqueue(pqueue* q, triangle* t)
 {
@@ -51,22 +75,15 @@ void pqueue_enqueue(pqueue* q, triangle* t)
   assert(q->size < q->capacity);
 
   q->size++;
-  q->items[q->size] = t;
-
   pos = q->size;
 
-  while ((pos > 1) && (q->items[pos]->distance_max > q->items[pos / 2]->distance_max))
+  pqueue_set(q, pos, t);
+
+  while (pos > 1 && q->items[pos]->distance_max > q->items[pos / 2]->distance_max)
   {
     pqueue_swap(q, pos, pos / 2);
     pos /= 2;
   }
-  
-  printf("enqueue\n");
-  for(int i = 1;	i <= q->size;		i++)
-  {
-	  printf("  i : %d \tdistance : %lf\n", i, q->items[i]->distance_max);
-  }
-  printf("\n");
 }
 triangle* pqueue_dequeue(pqueue* q)
 {
@@ -80,16 +97,17 @@ triangle* pqueue_dequeue(pqueue* q)
   assert(q->size > 0);
 
   first = q->items[1];
+  first->queue_pos = 0;
 
-  q->items[1] = q->items[q->size];	//j'ai un petit doute
-  q->size--;		//j'ai un énorme doute sur le faite de le mettre avant la boucle
+  pqueue_set(q, 1, q->items[q->size]);
 
+  q->size--;
 
   pos = 1;
 
   for (;;)
   {
-    if (pos*2 >= q->size)		//corrigé: version précedente avec pos >=q->size, donc quand pos == 4, size == 6 et left == 8 -> error
+    if ((pos * 2) > q->size)
       break;
 
     swap = -1;
@@ -101,12 +119,6 @@ triangle* pqueue_dequeue(pqueue* q)
     if (right <= q->size && q->items[right]->distance_max > q->items[left]->distance_max)
       swap = right;
 
-	/*printf("%d : distGauche = %lf\n", left, q->items[left]->distance_max);
-	if(right <= q->size)
-		printf("%d : distDroite = %lf\n", right, q->items[right]->distance_max);
-	if(swap != -1);
-		printf("%d -> distPos = %lf\n", swap, q->items[pos]->distance_max);*/
-
     if (swap > 0)
       pqueue_swap(q, pos, swap);
     else
@@ -114,13 +126,6 @@ triangle* pqueue_dequeue(pqueue* q)
 
     pos = swap;
   }
-    
-  printf("dequeue\n");
-  for(int i = 1;	i <= q->size;		i++)
-  {
-	  printf("  i : %d \tdistance : %lf\n", i, q->items[i]->distance_max);
-  }
-  printf("\n");
 
   return first;
 }

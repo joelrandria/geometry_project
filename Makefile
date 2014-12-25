@@ -19,7 +19,7 @@ ifneq ($(strip $(shell $(CC) -v 2>&1 | grep -i "Linux")),)
 endif
 #
 
-job: delaunay dox
+job: delaunay #dox
 
 delaunay:	settings.o \
 		vertex.o \

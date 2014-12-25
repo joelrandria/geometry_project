@@ -1,8 +1,5 @@
 /**
  * @file   pqueue.h
- * @author jo <jo@jo-linux>
- * @date   Thu Dec 25 19:45:30 2014
- *
  * @brief File de priorité de triangles basée sur leurs distances respectives à leurs sommets respectifs.
  */
 #ifndef __PQUEUE_H__
