@@ -1,3 +1,10 @@
+/**
+ * @file   settings.h
+ * @author jo <jo@jo-linux>
+ * @date   Thu Dec 25 19:41:36 2014
+ *
+ * @brief  Définition des types et des données relatifs aux paramètres d'exécution de l'application.
+ */
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
