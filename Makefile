@@ -19,9 +19,10 @@ ifneq ($(strip $(shell $(CC) -v 2>&1 | grep -i "Linux")),)
 endif
 #
 
-job: delaunay #dox
+job: delaunay dox
 
-delaunay:	vertex.o \
+delaunay:	settings.o \
+		vertex.o \
 		delaunay.o \
                 construction.o \
 		triangle.o \
@@ -29,6 +30,7 @@ delaunay:	vertex.o \
 		tstack.o
 
 	$(CC) $(GL_INCLUDE) $(GL_LIBDIR) \
+		settings.o \
 		vertex.o \
 		delaunay.o \
                 construction.o \
@@ -37,19 +39,16 @@ delaunay:	vertex.o \
 		tstack.o \
 	$(GL_LIBRARIES) -D$(OS) -o $@
 
-delaunay.o: delaunay.c
+delaunay.o:	delaunay.c
 
 		$(CC) $(GL_INCLUDE) $(CFLAGS) -D$(OS) $<
+
+dox:
+	rm -rf doc
+	doxygen
 
 clean:
 
 	@echo "operating system = $(OS), $(GL_INCLUDE) $(GL_LIBDIR)	"
-	rm -rf *.o delaunay DOX
-
-################################################################################
-# Generate doxygen documentation of file two.c using command file two.dox.
-#dox: two.c two.h
-#	rm -rf DOX
-#	doxygen two.dox
-#
+	rm -rf *.o delaunay doc
 
