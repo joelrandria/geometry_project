@@ -61,8 +61,8 @@ void pqueue_enqueue(pqueue* q, triangle* t);
  */
 triangle* pqueue_dequeue(pqueue* q);
 /**
- * Met à jour la position du triangle spécifié dans la file de priorité.\n
- * À appeler lors de la MàJ de la distance d'un triangle déjà présent dans la file.
+ * Met à jour la priorité du triangle spécifié dans la file de priorité.\n
+ * À appeler lors de changements de distances d'un triangle déjà présent dans la file.
  *
  * @param q La file de priorité.
  * @param pos La position du triangle à mettre à jour.
