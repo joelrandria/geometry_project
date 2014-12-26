@@ -3,17 +3,9 @@
 #include <math.h>
 #include <stdio.h>
 
-/*void triangle_init_candidat(triangle* t, vertex* v0, vertex* v1, vertex* v2, triangle* voisin0, triangle* voisin1, triangle* voisin2)
-{
-	const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
-	t->candidats = t->s[0];
-	t->s[0]->link[candidat][suiv] = t->s[1];
-	t->s[1]->link[candidat][suiv] = t->s[2];
-}*/
-
 void triangle_init(triangle* t,
-				   vertex* v0, vertex* v1, vertex* v2,
-				   triangle* voisin0, triangle* voisin1, triangle* voisin2)
+		   vertex* v0, vertex* v1, vertex* v2,
+		   triangle* voisin0, triangle* voisin1, triangle* voisin2)
 {
 	t->s[0] = v0;
 	t->s[1] = v1;
@@ -25,6 +17,8 @@ void triangle_init(triangle* t,
 
 	t->candidats = NULL;
 	t->distance_max = 0;
+
+	t->queue_pos = 0;
 }
 void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2)
 {

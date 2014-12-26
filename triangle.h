@@ -1,19 +1,33 @@
+/**
+ * @file   triangle.h
+ * @brief  Structure simplex triangle.
+ */
 #ifndef __TRIANGLE_H__
 #define __TRIANGLE_H__
 
 #include "vertex.h"
 
-/*! Structure pour représenter un triangle. */
+/**
+ * Définit un triangle du maillage. Encapsule les informations locales d'un simplex triangle et encapsule l'ensemble de sommets n'appartenant pas au maillage, se projetant verticalement sur celui-ci.
+ */
 typedef struct _triangle
 {
-  struct _vertex* s[3];		// sommets du triangle
-  struct _triangle* v[3];	// triangles voisins
+  /// Les sommets du triangle.
+  struct _vertex* s[3];
+  /// Les triangles adjacents à celui-ci.
+  struct _triangle* v[3];
 
-  double distance_max;		// distance du candidat du triangle, le plus loin verticalement
-  struct _vertex* candidats;	// liste des points dans le triangle (x,y) avec VLINK_CANDIDAT.
+  /// Distance verticale séparant ce triangle et son sommet candidat le plus éloigné verticalement.
+  double distance_max;
+  /// Liste des sommets n'appartenant pas au maillage mais se projetant verticalement sur ce triangle.\n Si non nul, le premier sommet ce cette liste est le plus distant verticalement de ce triangle.
+  struct _vertex* candidats;
+
+  /// Position du triangle dans la file de priorité.
+  int queue_pos;
+
 } triangle;
 
-/*! Création */
+/*! Construction / Modification */
 void triangle_init(triangle* t, vertex* v0, vertex* v1, vertex* v2,
 		   triangle* voisin0, triangle* voisin1, triangle* voisin2);
 void triangle_init2(triangle* t, vertex* v0, vertex* v1, vertex* v2);
