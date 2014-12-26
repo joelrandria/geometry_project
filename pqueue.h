@@ -36,7 +36,7 @@ pqueue* pqueue_create(int capacity);
  *
  * @param q La file de priorité à libérer.
  */
-void pqueue_delete(pqueue* q);	//free/delete
+void pqueue_delete(pqueue* q);
 
 /**
  * Affiche sur la sortie standard les éléments de la file de priorité spécifiée.
@@ -60,6 +60,14 @@ void pqueue_enqueue(pqueue* q, triangle* t);
  * @return Le triangle de priorité maximum de la file spécifiée.
  */
 triangle* pqueue_dequeue(pqueue* q);
+/**
+ * Met à jour la position du triangle spécifié dans la file de priorité.\n
+ * À appeler lors de la MàJ de la distance d'un triangle déjà présent dans la file.
+ *
+ * @param q La file de priorité.
+ * @param pos La position du triangle à mettre à jour.
+ */
+void pqueue_update(pqueue* q, int pos);
 
 /**
  * Batterie de tests de la structure de file de priorité.
