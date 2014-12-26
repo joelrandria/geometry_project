@@ -61,13 +61,14 @@ void pqueue_enqueue(pqueue* q, triangle* t)
     pos /= 2;
   }
   
-  printf("enqueue\n");
+  /*printf("enqueue\n");
   for(int i = 1;	i <= q->size;		i++)
   {
 	  printf("  i : %d \tdistance : %lf\n", i, q->items[i]->distance_max);
   }
-  printf("\n");
+  printf("\n");*/
 }
+
 triangle* pqueue_dequeue(pqueue* q)
 {
   int pos;
@@ -89,23 +90,17 @@ triangle* pqueue_dequeue(pqueue* q)
 
   for (;;)
   {
-    if (pos*2 >= q->size)		//corrigé: version précedente avec pos >=q->size, donc quand pos == 4, size == 6 et left == 8 -> error
+    left = pos * 2;
+    if (left >= q->size)		//corrigé: version précedente avec pos >=q->size, donc quand pos == 4, size == 6 et left == 8 -> error
       break;
 
     swap = -1;
-    left = pos * 2;
     right = (pos * 2) + 1;
 
     if (q->items[left]->distance_max > q->items[pos]->distance_max)
       swap = left;
     if (right <= q->size && q->items[right]->distance_max > q->items[left]->distance_max)
       swap = right;
-
-	/*printf("%d : distGauche = %lf\n", left, q->items[left]->distance_max);
-	if(right <= q->size)
-		printf("%d : distDroite = %lf\n", right, q->items[right]->distance_max);
-	if(swap != -1);
-		printf("%d -> distPos = %lf\n", swap, q->items[pos]->distance_max);*/
 
     if (swap > 0)
       pqueue_swap(q, pos, swap);
@@ -115,12 +110,12 @@ triangle* pqueue_dequeue(pqueue* q)
     pos = swap;
   }
     
-  printf("dequeue\n");
+  /*printf("dequeue\n");
   for(int i = 1;	i <= q->size;		i++)
   {
 	  printf("  i : %d \tdistance : %lf\n", i, q->items[i]->distance_max);
   }
-  printf("\n");
+  printf("\n");*/
 
   return first;
 }

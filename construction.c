@@ -10,9 +10,15 @@ void test(const int i)
  * retourne s'il n'y a plus de point à ajouter*/
 int insertPoint(pqueue* pq)
 {
+	if(pq->items[1]->candidats == NULL)
+		return 0;
 	triangle* t = pqueue_dequeue(pq);
-	creerTroisTriangles(t, pq);
+	vertex* p = t->candidats;
+	tstack* pile = creerTroisTriangles(t, pq);
+	corrigeTriangles(pile, p, pq);
+	
 	return (pq->items[1]->candidats != NULL);
+	//return (pq->items[1]->distance_max > 0.1;
 }
 
 void initCarre(vertex* premier, pqueue* pq)
@@ -24,39 +30,20 @@ void initCarre(vertex* premier, pqueue* pq)
 	
 	triangle** tgls = (triangle**) malloc(sizeof(triangle*)*2);
 	tgls[0] = triangle_create2(v, v2, v3);
-	tgls[1] = triangle_create2(v2, v3->link[naturel][suiv], v3);
+	tgls[1] = triangle_create2(v2, v3, v3->link[naturel][suiv]);
 	tgls[0]->v[0] = tgls[1];
 	tgls[1]->v[2] = tgls[0];
 	
 	v = v3->link[naturel][suiv]->link[naturel][suiv];	//v pointe vers le premier vertex qui n'ai pas un sommet du carré
-	while(v != NULL)
-	{
-		int sur = dansTriangle2d(tgls[0], v);
-		if(sur == 2)
-		{
-			exit(-1);
-		}
-		//if(sur > 0) //il est dans le triangle, mais il peut aussi être sur la limite entre les deux triangles
-		else if(sur == 1)
-		{
-			ajouteCandidat(tgls[0], v);
-		}
-		else 	//sur == 0
-		{
-			//seulement pour les deux premiers triangles
-			if(dansTriangle2d(tgls[1], v) == 2)	//sur carré?
-				exit(-1);
-			ajouteCandidat(tgls[1], v);
-		}
-		
-		v = v->link[naturel][suiv];
-	}
+	recopieType(v, naturel, VLINK_CANDIDAT);
+	repartageCandidats(tgls, 2, v);
 	
 	pqueue_enqueue(pq, tgls[0]);
 	pqueue_enqueue(pq, tgls[1]);
 	free(tgls);
 }
 
+/**met le vertex *v dans les candidats du triangle s'il est à l'intérieur*/
 int repartage(triangle* t, vertex* v)
 {
 	int sur = dansTriangle2d(t, v);
@@ -72,42 +59,178 @@ int repartage(triangle* t, vertex* v)
 		return 0;
 }
 
-void repartageCandidats(triangle** tgls, triangle* tdeb)
+void repartageCandidats(triangle** tgls, const int nbTriangles, vertex* candid)
 {
 	const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
-	vertex* v = tdeb->candidats, *suivant;
+	vertex* v = candid, *suivant;
 	while(v != NULL)
 	{
 		//bien mettre le suivant de chaque candidat à NULL;
 		suivant = v->link[candidat][suiv];
 		v->link[candidat][suiv] = NULL;
 		
+		int i = 0;
 		//mettre le candidat dans l'un des triangles.
-		if(!repartage(tgls[0] , v))
-			if(!repartage(tgls[1] , v))
-				repartage(tgls[2] , v);
+		while(i < nbTriangles && !repartage(tgls[i], v))
+			i++;
+		
 		v = suivant;
 	}
 }
 
 /**créer trois triangles en découpant un triangle par son premier candidat*/
-void creerTroisTriangles(triangle* t, pqueue* pq)
-{
+tstack* creerTroisTriangles(triangle* t, pqueue* pq)
+{	
+	test(10000);
+	triangle_print2D(t);
 	triangle** tgls = (triangle**) malloc(sizeof(triangle*)*3);
 	vertex* v = t->candidats;
-	tgls[0] = triangle_create(t->s[0], t->s[1], v, NULL, NULL, t->v[2]);
-	tgls[1] = triangle_create(v, t->s[1], t->s[2], t->v[0], NULL, tgls[0]);
+	t->candidats = NULL;
+	t->distance_max = 0.0;
+	 
+	tgls[0] = triangle_create(t->s[0], t->s[1], v, NULL, t, t->v[2]);
+	tgls[1] = triangle_create(v, t->s[1], t->s[2], t->v[0], t, tgls[0]);
 	tgls[0]->v[0] = tgls[1];
 	
-	tgls[2] = triangle_create(t->s[0], v, t->s[2], tgls[1], t->v[1], tgls[0]);
-	tgls[0]->v[1] = tgls[2];
-	tgls[1]->v[1] = tgls[2];
+	tgls[2] = t;
+	t->s[1] = v;
+	t->v[0] = tgls[1];	t->v[2] = tgls[0]; 	//t->v[1] = idem
 	
-	t->candidats = t->candidats->link[VLINK_CANDIDAT][VLINK_FORWARD];
-	repartageCandidats(tgls, t);
+	//actualiser voisins des triangles voisins
+	triangle* voisin = tgls[0]->v[2];
+	int indice;
+	if(voisin != NULL)
+	{
+		indice = triangle_indice_voisin(voisin, t);
+		voisin->v[indice] = tgls[0];
+	}
+	
+	voisin = tgls[1]->v[0];
+	if(voisin != NULL)
+	{
+		indice = triangle_indice_voisin(voisin, t);
+		voisin->v[indice] = tgls[1];
+	}
+	
+	//remettre les candidat dans le bon triangle
+	v = v->link[VLINK_CANDIDAT][VLINK_FORWARD];
+	repartageCandidats(tgls, 3, v);
 	
 	pqueue_enqueue(pq, tgls[0]);
 	pqueue_enqueue(pq, tgls[1]);
 	pqueue_enqueue(pq, tgls[2]);
+	tstack* pile = NULL;
+	pile = tstack_push(pile, tgls[0]);
+	pile = tstack_push(pile, tgls[1]);
+	pile = tstack_push(pile, tgls[2]);
 	free(tgls);
+		test(20000);
+	return pile;
+}
+
+
+
+
+void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
+{
+	while(pile != NULL)
+	{
+		printf("\n");
+		triangle* t1;
+		test(35); 
+		vertex_print2D(p);
+		pile = tstack_pop(pile, &t1);
+		printf("t1 : \n");
+		triangle_print2D(t1);
+		
+		int i1 = triangle_indice_point(t1, p);
+		
+		triangle* t2 = t1->v[i1];
+		printf("t2 : \n");
+		triangle_print2D(t2);
+		if(t2 == NULL)
+			continue;
+			
+		int i2 = triangle_indice_voisin(t2, t1);
+		vertex* p2 = t2->s[i2];
+		
+		//il ne faut pas que le quadrilatère formé par les deux triangles soit non-convexe (avec un angle de plus de 180°)
+		if(cote2d(t1->s[i1], t2->s[i2], t1->s[(i1+1)%3]) == cote2d(t1->s[i1], t2->s[i2], t1->s[(i1+2)%3]))
+			continue;
+		if(!triangleInCircle(t1, p2))
+		{
+			if(!triangleInCircle(t2, p))
+				continue;
+			else
+				printf("\t/!\\/!\\problème\n");
+		}
+		vertex* candid = t1->candidats;
+		if(candid == NULL)
+			candid = t2->candidats;
+		else
+		{
+			const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
+			vertex* v = candid, *suivant = candid->link[candidat][suiv];
+			while(suivant != NULL)
+			{
+				v = suivant;
+				suivant = v->link[candidat][suiv];
+			}
+			v->link[candidat][suiv] = t2->candidats;
+		}
+		t1->candidats = NULL;
+		t2->candidats = NULL;
+		t1->distance_max = 0.0;
+		t2->distance_max = 0.0;
+		//on fait tourner les indices de triangle pour que ce soit plus facile après, avec 0 qui sera le point opposé de chaque côté.
+		//rotationIndiceTriangle(t1, i1);
+		swapIndiceTriangle(t1, 0, i1);
+		//rotationIndiceTriangle(t2, i2);
+		swapIndiceTriangle(t2, 0, i2);
+		if(t1->s[1] == t2->s[1])	//s'ils ont même indice, je les échange.
+			swapIndiceTriangle(t2, 1, 2);	//plus facile d'échanger les indices quand on a le même point sur le même indice des deux triangle 
+		test(1000);
+		
+		t1->s[2] = t2->s[0];
+		
+		printf("******************nouveau test******************\n");
+		triangle_print2D(t1);
+		printf("\n");
+		triangle_print2D(t2->v[1]);
+		printf("********************fin test******************\n");
+		printf("\n");
+		t1->v[0] = t2->v[1];			//t1->v[2] idem
+		
+		t2->s[2] = t1->s[0];
+		printf("******************nouveau test 2******************\n");
+		triangle_print2D(t2);
+		printf("\n");
+		triangle_print2D(t1->v[1]);
+		printf("********************fin test 2******************\n");
+		printf("\n");
+		t2->v[0] = t1->v[1];			//t2->v[2] idem;
+		//actualiser voisins des triangles voisins
+		triangle* voisin = t1->v[0];
+		int indice;
+		if(voisin != NULL)		{
+			indice = triangle_indice_voisin(voisin, t2);
+			voisin->v[indice] = t1;
+		}
+		voisin = t2->v[0];
+		if(voisin != NULL)		{
+			indice = triangle_indice_voisin(voisin, t1);
+			voisin->v[indice] = t2;
+		}
+	
+		
+		t1->v[1] = t2;
+		t2->v[1] = t1;
+		
+		triangle** tgls = (triangle**) malloc(sizeof(triangle*)*2);
+		tgls[0] = t1;
+		tgls[1] = t2;
+		repartageCandidats(tgls, 2, candid);
+		free(tgls);
+		test(2000);
+	}	
 }

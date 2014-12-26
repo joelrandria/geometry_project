@@ -29,7 +29,20 @@ double ajouteCandidat(triangle* t, vertex* v);
 
 double triangle_vertical_distance(triangle* t, vertex* v);
 
+int triangleInCircle (const triangle *t, const vertex *D);
+
 /*! Tests */
 void triangle_tests();
 
+void triangle_print(const triangle* t);
+void triangle_print2D(const triangle* t);
+
+//rapprochement point et indice
+int triangle_indice_point(const triangle* t, const vertex* p);
+int triangle_indice_voisin(const triangle* t, const triangle* voisin);
+
+
+//modifier indice triangle
+void rotationIndiceTriangle(triangle* t, const int rot);
+void swapIndiceTriangle(triangle*t, const int i1, const int i2);
 #endif

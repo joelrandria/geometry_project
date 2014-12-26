@@ -123,7 +123,7 @@ int lexico_min(const vertex* points, const unsigned int point_count)
 int orientation(const vertex* a, const vertex* b, const vertex* c)
 {
   int normal_dot_product = (a->Y - b->Y) * (c->X - a->X) + (b->X - a->X) * (c->Y - a->Y);
-
+			//(c->Y-b->Y)*(b->X-a->X)-(b->Y-a->Y)*-(c->X-b->X);
   if (normal_dot_product > 0)
     return ORIENTATION_CCW;
   else if (normal_dot_product == 0)
@@ -204,6 +204,15 @@ vertex* chainageArriere(vertex* debList, const int type)
 	return debList;
 }
 
+void vertex_print(const vertex* v)
+{
+	printf("x: %lf, y: %lf, z:%lf\r\n", v->X, v->Y, v->Z);
+}
+void vertex_print2D(const vertex* v)
+{
+	printf("x: %lf, y: %lf\r\n", v->X, v->Y);
+}
+
 void vertex_print_all(vertex* v, int vlink, int vdirection)
 {
   vertex* start;
@@ -212,11 +221,22 @@ void vertex_print_all(vertex* v, int vlink, int vdirection)
 
   while (v != NULL)
   {
-    printf("x: %lf, y: %lf, z:%lf\r\n", v->X, v->Y, v->Z);
+	  vertex_print(v);
 
     v = v->link[vlink][vdirection];
 
     if (v == start)
       break;
   }
+}
+
+
+void recopieType(vertex* v, const int typeOrig, const int typeCopie)
+{
+	const int suiv = VLINK_FORWARD;
+	while(v != NULL)
+	{
+		v->link[typeCopie][suiv] = v->link[typeOrig][suiv];
+		v = v->link[typeOrig][suiv];
+	}
 }

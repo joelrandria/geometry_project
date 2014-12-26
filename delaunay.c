@@ -3,6 +3,9 @@
 
 // Initialisation des variables externes
 int _point_count = 0;
+int _test = 0;
+int _candid = 0;
+int _ins = -1;
 
 double _altitude_min = 0.0f;
 double _altitude_max = 0.5f;
@@ -105,7 +108,7 @@ int main(int argc, char **argv)
 	opterr = 0;
 	_point_count = 50;
 
-	while ((c = getopt(argc, argv, "n:")) != EOF)
+	while ((c = getopt(argc, argv, "n:t:c:i:")) != EOF)
 	{
 		switch (c)
 		{
@@ -114,6 +117,20 @@ int main(int argc, char **argv)
 				if ((sscanf(optarg, "%d", &_point_count) != 1) || _point_count <= 0)
 					_point_count = 50;
 				break;
+			case 't':
+				if ((sscanf(optarg, "%d", &_test) != 1) || _test < 1)
+					_test = 0;
+				break;
+			case 'c':
+				if ((sscanf(optarg, "%d", &_candid) != 1) || _candid < 1)
+					_candid = 0;
+				break;
+			case 'i':
+				if ((sscanf(optarg, "%d", &_ins) != 1) || _ins < 0)
+					_ins = -1;
+				break;
+
+
 
 			default: usage(); break;
 		}
@@ -134,8 +151,19 @@ int main(int argc, char **argv)
 
 	_queue = pqueue_create(2*_point_count-6);
 	initCarre(premier, _queue);
-	while(insertPoint(_queue));
+	if(_ins == -1)
+		while(insertPoint(_queue));
+	else
+		for(int i = 0;	i < _ins;	i++)
+			insertPoint(_queue);
+	printf("%lf\n",_queue->items[1]->distance_max);
+	printf("%d\n",_queue->items[1]->candidats == NULL);
 	
+	if(_test > 0)
+	{
+		printf("indice coloriage : \n");
+		triangle_print2D(_queue->items[_test]);
+	}
 	/*while(_queue->size > 1)
 	{
 		pqueue_dequeue(_queue);
@@ -178,6 +206,58 @@ void on_idle_event()
 	draw();
 }
 
+void drawVertex(const vertex* v)
+{
+	glVertex3f(v->X, v->Y, v->Z);
+}
+
+void drawTriangle(const triangle* t)
+{
+	if(t != NULL)
+	{
+		drawVertex(t->s[0]);
+		drawVertex(t->s[1]);
+		drawVertex(t->s[2]);
+	}
+}
+void drawTriangleAide(const triangle* t)
+{
+	glBegin(GL_TRIANGLES);
+	glColor3f(1,0,0);
+	drawTriangle(t->v[0]);
+	glColor3f(0,1,0);
+	drawTriangle(t->v[1]);
+	glColor3f(0,0,1);
+	drawTriangle(t->v[2]);
+	
+	glColor3f(1,0,0);
+	drawVertex(t->s[0]);
+	glColor3f(0,1,0);
+	drawVertex(t->s[1]);
+	glColor3f(0,0,1);
+	drawVertex(t->s[2]);
+	glEnd();
+}
+void drawCandidat(const triangle* t)
+{
+	glBegin(GL_TRIANGLES);
+	glColor3f(0.5,0.5,0.5);
+	drawTriangle(t);
+	glEnd();
+	
+	
+	glPointSize(7);
+	glBegin(GL_POINTS);
+	glColor3f(1,1,0);
+	vertex* v = t->candidats;
+	while(v != NULL)
+	{
+		drawVertex(v);
+		v = v->link[VLINK_CANDIDAT][VLINK_FORWARD];
+	}
+	glEnd();
+}
+
 void draw()
 {
 	
@@ -189,6 +269,10 @@ void draw()
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	if(_test > 0)
+		drawTriangleAide(_queue->items[_test]);
+	if(_candid > 0)
+		drawCandidat(_queue->items[_candid]);
 	//printf("nb = %d\n" , _queue->size);
 	glPointSize(3);
 	for(int i = 1;	i <= _queue->size;	i++)
@@ -200,23 +284,10 @@ void draw()
 			v = t->s[j];
 			val = (v->Z-_altitude_min)/(_altitude_max-_altitude_min);
 			glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
-			glVertex3f(v->X, v->Y, v->Z);
+			drawVertex(v);
 		}		
 		glEnd();	
 	}
-
-	
-	/*glBegin(GL_POINTS);
-
-	v = premier;
-	float val;
-	while (v != NULL)
-	{
-		val = (v->Z-_altitude_min)/(_altitude_max-_altitude_min);
-		glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
-		glVertex3f(v->X, v->Y, v->Z);
-		v = v->link[VLINK_NATURAL][VLINK_FORWARD];
-	}*/
 
 	glFlush();
 }

@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <assert.h>
 
 /*! Dimensions de l'espace */
 #define DIM 3
@@ -42,6 +43,8 @@ vertex* vertex_copy(vertex* tab, int count);
 void vertex_delete(vertex* v, int vlink);
 
 // Affichage
+void vertex_print(const vertex* v);
+void vertex_print2D(const vertex* v);
 void vertex_print_all(vertex* v, int vlink, int vdirection);
 
 // Relations
@@ -66,6 +69,8 @@ int local_polar_min(const vertex* points, const unsigned int point_count, int po
 double calculPolaire(const vertex* origin, const vertex* dest);
 double orientPolaire(const vertex* gauche, const vertex* centre, const vertex* droite);
 
+// fonction d'aide sur les types de lien
 vertex* chainageArriere(vertex* debList, const int type);
+void recopieType(vertex* v, const int typeOrig, const int typeCopie);
 
 #endif
