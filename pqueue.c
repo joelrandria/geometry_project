@@ -112,11 +112,11 @@ static void pqueue_down_heap(pqueue* q, int pos)
 
   for (;;)
   {
-    if ((pos * 2) > q->size)
+	  left = pos * 2;
+    if (left > q->size)
       break;
 
     swap = -1;
-    left = pos * 2;
     right = (pos * 2) + 1;
 
     if (q->items[left]->distance_max > q->items[pos]->distance_max)
@@ -153,6 +153,10 @@ void pqueue_update(pqueue* q, int pos)
 {
   pqueue_up_heap(q, pos);
   pqueue_down_heap(q, pos);
+}
+void pqueue_update_triangle(pqueue* q, triangle* t)
+{
+	pqueue_update(q,t->queue_pos);
 }
 
 static pqueue* pqueue_tests_create(int size)

@@ -193,6 +193,10 @@ int main(int argc, char **argv)
 		v = v->link[VLINK_CANDIDAT][VLINK_FORWARD];
 	}*/
 
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	glClearColor(0, 0, 0, 0);
+
 	glutMainLoop();
 
 	vertex_delete(premier, VLINK_NATURAL);
@@ -203,6 +207,7 @@ int main(int argc, char **argv)
 
 void on_idle_event()
 {
+	
 	draw();
 }
 
@@ -264,9 +269,7 @@ void draw()
 	vertex* v;
 	triangle* t;
 	float val;
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-	glClearColor(0, 0, 0, 0);
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if(_test > 0)

@@ -81,8 +81,6 @@ void repartageCandidats(triangle** tgls, const int nbTriangles, vertex* candid)
 /**créer trois triangles en découpant un triangle par son premier candidat*/
 tstack* creerTroisTriangles(triangle* t, pqueue* pq)
 {	
-	test(10000);
-	triangle_print2D(t);
 	triangle** tgls = (triangle**) malloc(sizeof(triangle*)*3);
 	vertex* v = t->candidats;
 	t->candidats = NULL;
@@ -119,12 +117,13 @@ tstack* creerTroisTriangles(triangle* t, pqueue* pq)
 	pqueue_enqueue(pq, tgls[0]);
 	pqueue_enqueue(pq, tgls[1]);
 	pqueue_enqueue(pq, tgls[2]);
+	pqueue_update_triangle(pq,t);
+	
 	tstack* pile = NULL;
 	pile = tstack_push(pile, tgls[0]);
 	pile = tstack_push(pile, tgls[1]);
 	pile = tstack_push(pile, tgls[2]);
 	free(tgls);
-		test(20000);
 	return pile;
 }
 
@@ -135,19 +134,12 @@ void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 {
 	while(pile != NULL)
 	{
-		printf("\n");
 		triangle* t1;
-		test(35); 
-		vertex_print2D(p);
 		pile = tstack_pop(pile, &t1);
-		printf("t1 : \n");
-		triangle_print2D(t1);
 		
 		int i1 = triangle_indice_point(t1, p);
 		
 		triangle* t2 = t1->v[i1];
-		printf("t2 : \n");
-		triangle_print2D(t2);
 		if(t2 == NULL)
 			continue;
 			
@@ -155,15 +147,11 @@ void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 		vertex* p2 = t2->s[i2];
 		
 		//il ne faut pas que le quadrilatère formé par les deux triangles soit non-convexe (avec un angle de plus de 180°)
+		//swapIndiceTriangle(t1, 1, i1);
 		if(cote2d(t1->s[i1], t2->s[i2], t1->s[(i1+1)%3]) == cote2d(t1->s[i1], t2->s[i2], t1->s[(i1+2)%3]))
 			continue;
 		if(!triangleInCircle(t1, p2))
-		{
-			if(!triangleInCircle(t2, p))
-				continue;
-			else
-				printf("\t/!\\/!\\problème\n");
-		}
+			continue;
 		vertex* candid = t1->candidats;
 		if(candid == NULL)
 			candid = t2->candidats;
@@ -189,25 +177,11 @@ void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 		swapIndiceTriangle(t2, 0, i2);
 		if(t1->s[1] == t2->s[1])	//s'ils ont même indice, je les échange.
 			swapIndiceTriangle(t2, 1, 2);	//plus facile d'échanger les indices quand on a le même point sur le même indice des deux triangle 
-		test(1000);
 		
 		t1->s[2] = t2->s[0];
-		
-		printf("******************nouveau test******************\n");
-		triangle_print2D(t1);
-		printf("\n");
-		triangle_print2D(t2->v[1]);
-		printf("********************fin test******************\n");
-		printf("\n");
 		t1->v[0] = t2->v[1];			//t1->v[2] idem
 		
 		t2->s[2] = t1->s[0];
-		printf("******************nouveau test 2******************\n");
-		triangle_print2D(t2);
-		printf("\n");
-		triangle_print2D(t1->v[1]);
-		printf("********************fin test 2******************\n");
-		printf("\n");
 		t2->v[0] = t1->v[1];			//t2->v[2] idem;
 		//actualiser voisins des triangles voisins
 		triangle* voisin = t1->v[0];
@@ -231,6 +205,10 @@ void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 		tgls[1] = t2;
 		repartageCandidats(tgls, 2, candid);
 		free(tgls);
-		test(2000);
+		pile = tstack_push(pile, t1);
+		pile = tstack_push(pile, t2);
+		pqueue_update_triangle(pq,t1);
+		pqueue_update_triangle(pq,t2);
+		pqueue_update_triangle(pq,t1);
 	}	
 }

@@ -70,6 +70,16 @@ triangle* pqueue_dequeue(pqueue* q);
 void pqueue_update(pqueue* q, int pos);
 
 /**
+ * Met à jour la priorité du triangle spécifié dans la file de priorité.\n
+ * À appeler lors de changements de distances d'un triangle déjà présent dans la file.
+ *
+ * @param q La file de priorité.
+ * @param t Le triangle à mettre à jour.
+ */
+void pqueue_update_triangle(pqueue* q, triangle* t);
+
+
+/**
  * Batterie de tests de la structure de file de priorité.
  */
 void pqueue_tests();

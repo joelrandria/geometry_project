@@ -212,7 +212,7 @@ int triangle_indice_voisin(const triangle* t, const triangle* voisin)
 	return indice;
 }
 
-
+/**il faut que A,B et C soit dans l'ordre CCW*/
 int InCircle (const vertex *A, const vertex *B, const vertex *C, const vertex *D)
 {
 	vertex_print(A);	vertex_print(B);	vertex_print(C);	vertex_print(D);
@@ -233,9 +233,27 @@ int InCircle (const vertex *A, const vertex *B, const vertex *C, const vertex *D
    return (det > 0.00);
 }
 
+int InCircle2 (const vertex *A, const vertex *B, const vertex *C, const vertex *D)
+{
+	const double 	a1 = (B->Y == A->Y	?	1000000/((B->X+A->X)/2.0)	:
+										-(B->X-A->X)/(B->Y-A->Y)),
+					b1 = (B->Y == A->Y	?	-1000000	:
+										((B->X-A->X)*(B->X+A->X)/(2.0*(B->Y-A->Y)))+
+												((B->Y+A->Y)/2.0)),
+					a2 = (B->Y == C->Y	?	1000000/((C->X+B->X)/2.0)	:
+										-(C->X-B->X)/(C->Y-B->Y)),
+					b2 = (B->Y == C->Y	?	-1000000	:
+										((C->X-B->X)*(C->X+B->X)/(2.0*(C->Y-B->Y)))+
+												((C->Y+B->Y)/2.0));
+	const double 	xc = (b2-b1)/(a1-a2),
+					yc = a1*xc+b1;
+						
+	return (hypot(A->X-xc,A->Y-yc) > hypot(D->X-xc,D->Y-yc) );
+}
+
 int triangleInCircle (const triangle *t, const vertex *D)
 {
-	return InCircle(t->s[0], t->s[1], t->s[2], D);
+	return InCircle2(t->s[0], t->s[1], t->s[2], D);
 }
 
 /**faire tourner les indices des sommets du triangle afin de se retrouver avec une configuration plus confortable et éviter trop de condition
