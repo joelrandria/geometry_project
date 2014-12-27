@@ -8,7 +8,7 @@ void test(const int i)
 
 /**
  * retourne s'il n'y a plus de point à ajouter*/
-int insertPoint(pqueue* pq)
+int insertPoint(pqueue* pq, const double goodness_of_fit, const int face)
 {
 	if(pq->items[1]->candidats == NULL)
 		return 0;
@@ -17,8 +17,8 @@ int insertPoint(pqueue* pq)
 	tstack* pile = creerTroisTriangles(t, pq);
 	corrigeTriangles(pile, p, pq);
 	
-	return (pq->items[1]->candidats != NULL);
-	//return (pq->items[1]->distance_max > 0.1;
+	//return (pq->items[1]->candidats != NULL);
+	return (pq->items[1]->distance_max > goodness_of_fit && (face ==-1 || face > pq->size));
 }
 
 void initCarre(vertex* premier, pqueue* pq)
@@ -171,9 +171,7 @@ void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 		t1->distance_max = 0.0;
 		t2->distance_max = 0.0;
 		//on fait tourner les indices de triangle pour que ce soit plus facile après, avec 0 qui sera le point opposé de chaque côté.
-		//rotationIndiceTriangle(t1, i1);
 		swapIndiceTriangle(t1, 0, i1);
-		//rotationIndiceTriangle(t2, i2);
 		swapIndiceTriangle(t2, 0, i2);
 		if(t1->s[1] == t2->s[1])	//s'ils ont même indice, je les échange.
 			swapIndiceTriangle(t2, 1, 2);	//plus facile d'échanger les indices quand on a le même point sur le même indice des deux triangle 

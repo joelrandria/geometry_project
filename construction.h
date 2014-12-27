@@ -8,7 +8,7 @@
 #include <assert.h>
 
 void initCarre(vertex* premier, pqueue* pq);
-int insertPoint(pqueue* pq);
+int insertPoint(pqueue* pq, const double goodness_of_fit, const int face);
 
 int repartage(triangle* t, vertex* v);
 void repartageCandidats(triangle** tgls, const int nbTriangles, vertex* candid);

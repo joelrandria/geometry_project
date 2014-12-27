@@ -1,11 +1,15 @@
 #include "delaunay.h"
 #include "pqueue.h"
+#include <time.h>
 
 // Initialisation des variables externes
 int _point_count = 0;
 int _test = 0;
 int _candid = 0;
 int _ins = -1;
+int _face = -1;
+double _goodness_of_fit = 0.0;
+int _line = 0;
 
 double _altitude_min = 0.0f;
 double _altitude_max = 0.5f;
@@ -108,7 +112,7 @@ int main(int argc, char **argv)
 	opterr = 0;
 	_point_count = 50;
 
-	while ((c = getopt(argc, argv, "n:t:c:i:")) != EOF)
+	while ((c = getopt(argc, argv, "n:t:c:i:f:s:l")) != EOF)
 	{
 		switch (c)
 		{
@@ -129,6 +133,17 @@ int main(int argc, char **argv)
 				if ((sscanf(optarg, "%d", &_ins) != 1) || _ins < 0)
 					_ins = -1;
 				break;
+			case 'f':
+				if ((sscanf(optarg, "%d", &_face) != 1) || _face < 0)
+					_face = -1;
+				break;
+			case 's':
+				if ((sscanf(optarg, "%lf", &_goodness_of_fit) != 1) || _goodness_of_fit < 0.0)
+					_goodness_of_fit = 0.0;
+				break;
+			case 'l':
+				_line = 1;
+				break;
 
 
 
@@ -138,6 +153,7 @@ int main(int argc, char **argv)
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
+	//glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowPosition(5,5);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutCreateWindow("Delaunay");
@@ -152,49 +168,22 @@ int main(int argc, char **argv)
 	_queue = pqueue_create(2*_point_count-6);
 	initCarre(premier, _queue);
 	if(_ins == -1)
-		while(insertPoint(_queue));
+		while(insertPoint(_queue, _goodness_of_fit, _face));
 	else
 		for(int i = 0;	i < _ins;	i++)
-			insertPoint(_queue);
-	printf("%lf\n",_queue->items[1]->distance_max);
-	printf("%d\n",_queue->items[1]->candidats == NULL);
+			if(!insertPoint(_queue, _goodness_of_fit, _face) && i != _ins-1)
+			{
+				printf("nombre d'insertion donnée par -i trop élevé.\n");
+				break;
+			}
 	
 	if(_test > 0)
 	{
 		printf("indice coloriage : \n");
 		triangle_print2D(_queue->items[_test]);
 	}
-	/*while(_queue->size > 1)
-	{
-		pqueue_dequeue(_queue);
-	}
-	printf("\n");
-	printf("nb : %d\n", _queue->size);*/
-	/*for(int i = 0;	i < 3;	i++)
-		printf("x: %lf, y: %lf, z:%lf\r\n", 
-		_queue->items[1]->s[i]->X, _queue->items[1]->s[i]->Y, _queue->items[1]->s[i]->Z);
-	*/
-	//vertex_print_all(premier, VLINK_LEXICO, VLINK_FORWARD);
-	/*triangle** tgls = algo();
-	//vertex_print_all(tgls[0]->candidats, VLINK_CANDIDAT, VLINK_FORWARD);
-	vertex* v = tgls[0]->candidats;
-	while (v != NULL)
-	{
-		printf("hauteur: %lf, x: %lf, y: %lf, z:%lf\r\n", triangle_vertical_distance(tgls[0], v), v->X, v->Y, v->Z);
-		v = v->link[VLINK_CANDIDAT][VLINK_FORWARD];
-	}
-	printf("\n");
-	
-	//vertex_print_all(tgls[1]->candidats, VLINK_CANDIDAT, VLINK_FORWARD);
-	v = tgls[1]->candidats;
-	while (v != NULL)
-	{
-		printf("hauteur: %lf, x: %lf, y: %lf, z:%lf\r\n", triangle_vertical_distance(tgls[1], v), v->X, v->Y, v->Z);
-		v = v->link[VLINK_CANDIDAT][VLINK_FORWARD];
-	}*/
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
 	glClearColor(0, 0, 0, 0);
 
 	glutMainLoop();
@@ -207,8 +196,12 @@ int main(int argc, char **argv)
 
 void on_idle_event()
 {
-	
+	clock_t start = clock();
 	draw();
+	clock_t end = clock();
+	//printf("temps : %lf\n", (end-start)/((double)CLOCKS_PER_SEC));
+	if((end-start)/((double)CLOCKS_PER_SEC) < 0.02)
+		usleep(20000.0-1000000.0*(end-start)/((double)CLOCKS_PER_SEC));
 }
 
 void drawVertex(const vertex* v)
@@ -269,7 +262,9 @@ void draw()
 	vertex* v;
 	triangle* t;
 	float val;
-	
+		
+	//glColor3f(0.0, 0.0, 0.0);
+	//glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if(_test > 0)
@@ -277,10 +272,16 @@ void draw()
 	if(_candid > 0)
 		drawCandidat(_queue->items[_candid]);
 	//printf("nb = %d\n" , _queue->size);
-	glPointSize(3);
+	glPointSize(1);
+	
+	//glColor3f(1.0, 1.0, 1.0);
+	if(!_line)
+		glBegin(GL_TRIANGLES);
+		
 	for(int i = 1;	i <= _queue->size;	i++)
 	{
-		glBegin(GL_LINE_LOOP);
+		if(_line)
+			glBegin(GL_LINE_LOOP);
 		t = _queue->items[i];
 		for(int j = 0;	j < 3;	j++)
 		{
@@ -288,9 +289,12 @@ void draw()
 			val = (v->Z-_altitude_min)/(_altitude_max-_altitude_min);
 			glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
 			drawVertex(v);
-		}		
-		glEnd();	
+		}
+		if(_line)		
+			glEnd();	
 	}
+	if(!_line)
+		glEnd();
 
 	glFlush();
 }
