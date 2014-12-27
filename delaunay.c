@@ -10,9 +10,11 @@ int _ins = -1;
 int _face = -1;
 double _goodness_of_fit = 0.0;
 int _line = 0;
+int _sans_echec = 1;
+int _bordure = 1;
 
-double _altitude_min = 0.0f;
-double _altitude_max = 0.5f;
+double _altitude_min = 0.0;
+double _altitude_max = 1.0;
 
 //vertex* premier = NULL;
 pqueue* _queue = NULL;
@@ -60,35 +62,43 @@ vertex* create_random_points()
 				myRandom(MARGIN, WINDOW_WIDTH-MARGIN),
 				myRandom(MARGIN, WINDOW_HEIGHT-MARGIN);
 				myRandom(0,_altitude_max));*/
-		v = vertex_create(0,0, myRandom(_altitude_min, _altitude_max));
+		if(_sans_echec)
+			v = vertex_create(0,0, myRandom(_altitude_min, _altitude_max));
+		else
+			v = vertex_create(myRandom(0, 1), myRandom(0, 1), myRandom(_altitude_min, _altitude_max));
+		
 		dernier->link[naturel][suiv] = v;
 		dernier = v;
 
-		do
+		if(_sans_echec)
 		{
-			v->X = myRandom(0, 1),
-			v->Y = myRandom(0, 1);
-
-			vPrec = premier;
-			v2= vPrec->link[lexico][suiv];
-			while(v2 != NULL && (cmp = lexico_cmp(v2, v))== -1)
+			do
 			{
-				vPrec = v2;
-				v2 = v2->link[lexico][suiv];
-			}
+				v->X = myRandom(0, 1),
+				v->Y = myRandom(0, 1);
 
-			if(cmp != 0)	//si le vertex(x,y) n'est pas déjà dans la chaine	(-1 => v2==NULL)
-			{
-				vPrec->link[lexico][suiv] = v;
-				v->link[lexico][suiv] = v2;
+				vPrec = premier;
+				v2= vPrec->link[lexico][suiv];
+				while(v2 != NULL && (cmp = lexico_cmp(v2, v))== -1)
+				{
+					vPrec = v2;
+					v2 = v2->link[lexico][suiv];
+				}
+
+				if(cmp != 0)	//si le vertex(x,y) n'est pas déjà dans la chaine	(-1 => v2==NULL)
+				{
+					vPrec->link[lexico][suiv] = v;
+					v->link[lexico][suiv] = v2;
+				}
+				//else: il faut changer les valeurs du vertex.
 			}
-			//else: il faut changer les valeurs du vertex.
+			while(cmp == 0);	//tant que le vertex à les mêmes coordonnées (x,y) qu'un autre point
 		}
-		while(cmp == 0);	//tant que le vertex à les mêmes coordonnées (x,y) qu'un autre point
 	}
 
-	chainageArriere(premier, naturel);
-	chainageArriere(premier, lexico);
+	//chainageArriere(premier, naturel);
+	//chainageArriere(premier, lexico);
+	printf("fin de création des points.\n");
 	
 	return premier;
 }
@@ -112,39 +122,51 @@ int main(int argc, char **argv)
 	opterr = 0;
 	_point_count = 50;
 
-	while ((c = getopt(argc, argv, "n:t:c:i:f:s:l")) != EOF)
+	while ((c = getopt(argc, argv, "n:t:c:i:f:s:g:h:leb")) != EOF)
 	{
 		switch (c)
 		{
-			case 'n':
-
+			case 'n':	//nombre de points à créer
 				if ((sscanf(optarg, "%d", &_point_count) != 1) || _point_count <= 0)
 					_point_count = 50;
 				break;
-			case 't':
+			case 't':	//met en évidence un triangle et ses voisins, rien sinon (test si les voisins sont corrects)
 				if ((sscanf(optarg, "%d", &_test) != 1) || _test < 1)
 					_test = 0;
 				break;
-			case 'c':
+			case 'c':	//met en évidence un triangle et ses candidats, rien sinon (test si tous les candidats sont dans le triangle)
 				if ((sscanf(optarg, "%d", &_candid) != 1) || _candid < 1)
 					_candid = 0;
 				break;
-			case 'i':
+			case 'i':	//nombre d'itération d'insertion de candidat avant d'arrêter.
 				if ((sscanf(optarg, "%d", &_ins) != 1) || _ins < 0)
 					_ins = -1;
 				break;
-			case 'f':
+			case 'f':	//nombre de face à calculer avant d'arrêter, calcule tout sinon.
 				if ((sscanf(optarg, "%d", &_face) != 1) || _face < 0)
 					_face = -1;
 				break;
-			case 's':
+			case 's':	//goodness of fit
 				if ((sscanf(optarg, "%lf", &_goodness_of_fit) != 1) || _goodness_of_fit < 0.0)
 					_goodness_of_fit = 0.0;
 				break;
-			case 'l':
+			case 'g':	//hauteur minimale
+				if (sscanf(optarg, "%lf", &_altitude_min) != 1)
+					_altitude_min = 0.0;
+				break;
+			case 'h':	//hauteur maximale
+				if (sscanf(optarg, "%lf", &_altitude_max) != 1)
+					_altitude_max = 1.0;
+				break;
+			case 'l':	//n'afficher que les contours des triangles, sinon remplis le triangle.
 				_line = 1;
 				break;
-
+			case 'e':	//créer les points sans vérifier qu'il y ait un deuxième points à la même coordonnée (une petite chance de crasher, mais 1000 fois plus rapide à la création des points)
+				_sans_echec = 0;
+				break;
+			case 'b':	//n'affiche pas les triangles aux bords du carré, sinon si.
+				_bordure = 0;
+				break;
 
 
 			default: usage(); break;
@@ -200,8 +222,8 @@ void on_idle_event()
 	draw();
 	clock_t end = clock();
 	//printf("temps : %lf\n", (end-start)/((double)CLOCKS_PER_SEC));
-	if((end-start)/((double)CLOCKS_PER_SEC) < 0.02)
-		usleep(20000.0-1000000.0*(end-start)/((double)CLOCKS_PER_SEC));
+	if((end-start)/((double)CLOCKS_PER_SEC) < 0.016)
+		usleep(16000.0-1000000.0*(end-start)/((double)CLOCKS_PER_SEC));
 }
 
 void drawVertex(const vertex* v)
@@ -280,9 +302,13 @@ void draw()
 		
 	for(int i = 1;	i <= _queue->size;	i++)
 	{
+		t = _queue->items[i];
+		if(!_bordure)
+			if(	t->s[0]->X == 0.0 || t->s[1]->X == 0.0 || t->s[2]->X == 0.0 || 
+				t->s[0]->X == 1.0 || t->s[1]->X == 1.0 || t->s[2]->X == 1.0)
+					continue;
 		if(_line)
 			glBegin(GL_LINE_LOOP);
-		t = _queue->items[i];
 		for(int j = 0;	j < 3;	j++)
 		{
 			v = t->s[j];

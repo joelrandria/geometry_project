@@ -48,15 +48,14 @@ int repartage(triangle* t, vertex* v)
 {
 	int sur = dansTriangle2d(t, v);
 	if(sur == 2)	//sur une arête
-		exit(-1);
+		printf("point placé pile sur un bord d'un triangle.\n");//exit(-1);
 	//if(sur > 0) //il est dans le triangle, mais il peut aussi être sur la limite entre les deux triangles
 	else if(sur == 1)
 	{
 		ajouteCandidat(t, v);
 		return 1;
 	}
-	else 	//sur == 0
-		return 0;
+	return 0;
 }
 
 void repartageCandidats(triangle** tgls, const int nbTriangles, vertex* candid)
