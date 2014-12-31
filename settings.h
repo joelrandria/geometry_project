@@ -32,17 +32,20 @@ typedef enum
 /*! Encapsule l'ensemble des paramètres d'exécution de l'application. */
 typedef struct _settings
 {
-  /// Nombre total de sommets générés
+  /// Nombre total de sommets générés.
   int vertex_count;
 
-  /// Mode de visualisation courant
+  /// Altitude maximum du terrain.
+  double altitude_max;
+
+  /// Mode de visualisation courant.
   viewmode view_mode;
 
-  /// Mode d'arrêt de l'affinage du maillage
+  /// Mode d'arrêt de l'affinage du maillage.
   int stop_mode;
-  /// Nombre de faces maximum du maillage (paramètre du mode d'arrêt STOPMODE_FACE_COUNT)
+  /// Nombre de faces maximum du maillage (paramètre du mode d'arrêt STOPMODE_FACE_COUNT).
   int max_face_count;
-  /// Goodness Of Fit (paramètre du mode d'arrêt STOPMODE_GOF)
+  /// Goodness Of Fit (paramètre du mode d'arrêt STOPMODE_GOF).
   float gof;
 
 } settings;

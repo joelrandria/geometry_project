@@ -23,4 +23,7 @@ extern pqueue* _queue;
  */
 void on_idle_event();
 
+// Affichage
+void draw();
+
 #endif

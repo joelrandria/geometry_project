@@ -36,8 +36,20 @@ static void camera_initialize()
 
   if (_camera == NULL)
   {
+    /* camera_pos.x = 0.5f; */
+    /* camera_pos.y = 0.5f; */
+    /* camera_pos.z = 1.75f; */
+
+    /* camera_up.x = 0; */
+    /* camera_up.y = 1; */
+    /* camera_up.z = 0; */
+
+    /* camera_front.x = 0; */
+    /* camera_front.y = 0; */
+    /* camera_front.z = -1; */
+
     camera_pos.x = 0.5f;
-    camera_pos.y = -1;
+    camera_pos.y = -0.5f;
     camera_pos.z = 0.5f;
 
     camera_up.x = 0;
@@ -132,8 +144,6 @@ static void render_3d(pqueue* p)
   glMatrixMode(GL_PROJECTION);
   gluPerspective(60.f, 1.f, 0.01f, 100.f);
 
-  glColor3f(1, 1, 1);
-
   for (i = 1; i <= p->size; ++i)
   {
     t = p->items[i];
@@ -142,8 +152,10 @@ static void render_3d(pqueue* p)
 
     for (j = 0; j < 3; ++j)
     {
+      glColor3f(t->s[j]->Z, t->s[j]->Z, t->s[j]->Z);
+      //glColor3f(t->s[j]->X, t->s[j]->Y, 0);
+
       glVertex3f(t->s[j]->X, t->s[j]->Y, t->s[j]->Z);
-      glColor3f(t->s[j]->Z / 1.0f, t->s[j]->Z / 1.0f, t->s[j]->Z / 1.0f);
     }
 
     glEnd();
@@ -185,6 +197,9 @@ void process_key_pressed(unsigned char key, int x, int y)
   case 'd': t = &_camera_right_move; break;
 
   case 'p': camera_print(_camera); break;
+
+  case '+': glEnable(GL_CULL_FACE); break;
+  case '-': glDisable(GL_CULL_FACE); break;
 
   case ' ': _settings->view_mode = (_settings->view_mode == VIEWMODE_3D ? VIEWMODE_2D : VIEWMODE_3D); break;
   }
