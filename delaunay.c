@@ -9,6 +9,7 @@
 #endif
 
 #include <time.h>
+#include <unistd.h>
 #include <stdio.h>
 
 /* int _point_count = 0; */
@@ -110,14 +111,14 @@ int main(int argc, char **argv)
   settings_from_cmdline(argc, argv, _settings);
 
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
+  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH);
 
   glutInitWindowPosition(5,5);
   glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
   glutCreateWindow("Delaunay");
 
   glutIdleFunc(on_idle_event);
-  glutDisplayFunc(/* render */draw);
+  glutDisplayFunc(render/* draw */);
   glutKeyboardFunc(process_key_pressed);
   glutSpecialFunc(process_specialkey_pressed);
   glutMotionFunc(process_mouse_moved);
@@ -148,6 +149,8 @@ int main(int argc, char **argv)
 
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 0);
+	if(_settings->view_mode == VIEWMODE_3D)
+		glEnable(GL_DEPTH_TEST);
 
   glutMainLoop();
 
@@ -160,14 +163,14 @@ int main(int argc, char **argv)
 void on_idle_event()
 {
   clock_t start = clock();
-  //render();
-  draw();
+  render();
+  //draw();
   clock_t end = clock();
 
   //printf("temps : %lf\n", (end-start)/((double)CLOCKS_PER_SEC));
 
-  /* if((end-start)/((double)CLOCKS_PER_SEC) < 0.016) */
-  /*   usleep(16000.0 - 1000000.0 * (end - start) / ((double)CLOCKS_PER_SEC)); */
+  if((end-start)/((double)CLOCKS_PER_SEC) < 0.016)
+     usleep(16000.0 - 1000000.0 * (end - start) / ((double)CLOCKS_PER_SEC));
 }
 
 void drawVertex(const vertex* v)

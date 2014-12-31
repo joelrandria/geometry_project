@@ -215,7 +215,7 @@ int triangle_indice_voisin(const triangle* t, const triangle* voisin)
 /**il faut que A,B et C soit dans l'ordre CCW*/
 int InCircle (const vertex *A, const vertex *B, const vertex *C, const vertex *D)
 {
-	vertex_print(A);	vertex_print(B);	vertex_print(C);	vertex_print(D);
+	//vertex_print(A);	vertex_print(B);	vertex_print(C);	vertex_print(D);
 	/*if(orientation(A, B, D) == orientation(A, C, D))
 		return 0;	//il n'est pas dedans, résultat non voulu sinon. Il faut que A soit l'opposé de D, et B et D l'intersection des deux triangles.
 	*/
@@ -229,7 +229,7 @@ int InCircle (const vertex *A, const vertex *B, const vertex *C, const vertex *D
   
    
    /* should return (det > 0.0) ? IN : (det == 0.0) ? ON : OUT; really */
-   printf("det : %lf\n", det);
+   //printf("det : %lf\n", det);
    return (det > 0.00);
 }
 
@@ -253,7 +253,7 @@ int InCircle2 (const vertex *A, const vertex *B, const vertex *C, const vertex *
 
 int triangleInCircle (const triangle *t, const vertex *D)
 {
-	return InCircle2(t->s[0], t->s[1], t->s[2], D);
+	return InCircle(t->s[0], t->s[1], t->s[2], D);
 }
 
 /**faire tourner les indices des sommets du triangle afin de se retrouver avec une configuration plus confortable et éviter trop de condition

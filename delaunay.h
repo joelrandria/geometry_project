@@ -1,6 +1,6 @@
 /**
  * @file   delaunay.h
- * @brief  
+ * @brief  Application.
  */
 #ifndef __DELAUNAY_H__
 #define __DELAUNAY_H__
