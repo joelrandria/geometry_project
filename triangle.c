@@ -100,7 +100,7 @@ double triangle_vertical_distance(triangle* t, vertex* v)
 
   vProjZ = (((t->s[0]->X - v->X) * nX) + ((t->s[0]->Y - v->Y) * nY) + (t->s[0]->Z * nZ)) / nZ;
 
-  return v->Z-vProjZ;//(fabs(v->Z - vProjZ));
+  return fabs(v->Z-vProjZ);//(fabs(v->Z - vProjZ));
 }
 
 /**le triangle a déjà au moins ses trois sommets comme candidats*/

@@ -10,6 +10,7 @@
 #endif
 
 #include <math.h>
+#include <stdio.h>
 
 /// Caméra globale
 static camera* _camera = NULL;
@@ -37,16 +38,28 @@ static void camera_initialize()
   if (_camera == NULL)
   {
     camera_pos.x = 0.5f;
-    camera_pos.y = -1;
-    camera_pos.z = 0.5f;
+    camera_pos.y = 0.5f;
+    camera_pos.z = 1.85f;
 
     camera_up.x = 0;
-    camera_up.y = 0;
-    camera_up.z = 1;
+    camera_up.y = 1;
+    camera_up.z = 0;
 
     camera_front.x = 0;
-    camera_front.y = 1;
-    camera_front.z = 0;
+    camera_front.y = 0;
+    camera_front.z = -1;
+
+    /* camera_pos.x = 0.5f; */
+    /* camera_pos.y = -0.5f; */
+    /* camera_pos.z = 0.5f; */
+
+    /* camera_up.x = 0; */
+    /* camera_up.y = 0; */
+    /* camera_up.z = 1; */
+
+    /* camera_front.x = 0; */
+    /* camera_front.y = 1; */
+    /* camera_front.z = 0; */
 
     _camera = camera_create(&camera_pos, &camera_up, &camera_front);
   }
@@ -130,29 +143,32 @@ static void render_3d(pqueue* p)
 
   camera_initialize();
 
+  glEnable(GL_DEPTH_TEST);
+
   glMatrixMode(GL_MODELVIEW);
   camera_get_modelview_matrix(_camera, view_matrix);
   glLoadMatrixd(view_matrix);
 
   glMatrixMode(GL_PROJECTION);
-  gluPerspective(60.f, 1.f, 0.1f, 100.f);
+  gluPerspective(60.f, 1.f, 0.001f, 10.f);
+  
+  glBegin(GL_TRIANGLES);
 
-	glBegin(GL_TRIANGLES);
-	for (i = 1; i <= p->size; ++i)
-	{
-		t = p->items[i];
-		/*if(	t->s[0]->X == 0.0 || t->s[1]->X == 0.0 || t->s[2]->X == 0.0 ||
-			t->s[0]->X == 1.0 || t->s[1]->X == 1.0 || t->s[2]->X == 1.0)
-				continue;*/
-		for (j = 0; j < 3; ++j)
-		{			
-			v = t->s[j];
-			val = v->Z;		//(v->Z-_altitude_min)/(_altitude_max-_altitude_min);
-			glColor3f(0.600+val*0.40, 0.20+val*0.80, val);
-			glVertex3f(t->s[j]->X, t->s[j]->Y, t->s[j]->Z);
-		}
-	}
-    glEnd();
+  for (i = 1; i <= p->size; ++i)
+  {
+    t = p->items[i];
+
+    for (j = 0; j < 3; ++j)
+    {
+      v = t->s[j];
+      val = v->Z;
+
+      glColor3f(0.600+val*0.40, 0.20+val*0.80, val);
+      glVertex3f(t->s[j]->X, t->s[j]->Y, t->s[j]->Z);
+    }
+  }
+
+  glEnd();
 }
 
 void render()
@@ -191,6 +207,12 @@ void process_key_pressed(unsigned char key, int x, int y)
 
   case 'p': camera_print(_camera); break;
 
+  case '+': glEnable(GL_CULL_FACE); break;
+  case '-': glDisable(GL_CULL_FACE); break;
+
+  case '*': glEnable(GL_DEPTH_TEST); printf("GL_DEPTH_TEST enabled\r\n"); break;
+  case '/': glDisable(GL_DEPTH_TEST); printf("GL_DEPTH_TEST disabled\r\n"); break;
+
   case ' ': _settings->view_mode = (_settings->view_mode == VIEWMODE_3D ? VIEWMODE_2D : VIEWMODE_3D); break;
   }
 
@@ -205,9 +227,9 @@ void process_specialkey_pressed(int key, int x, int y)
 
   switch (key)
   {
-  case GLUT_KEY_PAGE_UP: 
-  case GLUT_KEY_UP:			t = &_camera_up_move; break;
-  case GLUT_KEY_PAGE_DOWN: 
+  case GLUT_KEY_PAGE_UP:
+  case GLUT_KEY_UP:		t = &_camera_up_move; break;
+  case GLUT_KEY_PAGE_DOWN:
   case GLUT_KEY_DOWN:		t = &_camera_down_move; break;
   case GLUT_KEY_LEFT: 		t = &_camera_left_move; break;
   case GLUT_KEY_RIGHT: 		t = &_camera_right_move; break;

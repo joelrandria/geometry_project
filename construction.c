@@ -17,7 +17,6 @@ int insertPoint(pqueue* pq, settings* s)
   switch (s->stop_mode)
   {
   case STOPMODE_FACE_COUNT:
-
     if (pq->size >= s->max_face_count)
       return (0);
     break;

@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-/// Variables externes d'accès aux paramètres de la ligne de commande.
+/*! Variables externes d'accès aux paramètres de la ligne de commande. */
 extern int opterr;
 extern char *optarg;
 
 static void usage()
 {
-  printf("Usage: ./delaunay [-n vertex_count] [-v view_mode] [-f max_face_count] [-s gof]\r\n");
+  printf("Usage: ./delaunay [-n vertex_count] [-a altitude_max] [-v view_mode] [-f max_face_count] [-s gof]\r\n");
 
   exit(0);
 }
@@ -22,6 +22,7 @@ settings* settings_alloc()
 static void settings_reset(settings* s)
 {
   s->vertex_count = 50;
+  s->altitude_max = 1;
 
   s->view_mode = VIEWMODE_3D;
 
@@ -37,13 +38,20 @@ void settings_from_cmdline(int argc, char** argv, settings* s)
 
   settings_reset(s);
 
-  while ((opt = getopt(argc, argv, "n:v:f:s:")) != EOF)
+  while ((opt = getopt(argc, argv, "n:a:v:f:s:")) != EOF)
   {
     switch (opt)
     {
     case 'n':
 
       if (sscanf(optarg, "%d", &s->vertex_count) != 1 || s->vertex_count < 4)
+	usage();
+
+      break;
+
+    case 'a':
+
+      if (sscanf(optarg, "%lf", &s->altitude_max) != 1 || s->altitude_max < 0)
 	usage();
 
       break;
@@ -82,6 +90,7 @@ void settings_from_cmdline(int argc, char** argv, settings* s)
 void settings_print(settings* s)
 {
   printf("vertex_count: %d\r\n", s->vertex_count);
+  printf("altitude_max: %f\r\n", s->altitude_max);
 
   printf("view_mode: ");
   switch (s->view_mode)

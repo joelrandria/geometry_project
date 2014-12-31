@@ -1,6 +1,6 @@
 /**
  * @file   delaunay.h
- * @brief  
+ * @brief  Application.
  */
 #ifndef __DELAUNAY_H__
 #define __DELAUNAY_H__
@@ -22,5 +22,8 @@ extern pqueue* _queue;
  * Gestionnaire d'évènement executé lors du passage de l'application à l'état inactif.
  */
 void on_idle_event();
+
+// Affichage
+void draw();
 
 #endif
