@@ -15,6 +15,10 @@ static void usage()
   exit(0);
 }
 
+settings* settings_alloc()
+{
+  return (malloc(sizeof(settings)));
+}
 static void settings_reset(settings* s)
 {
   s->vertex_count = 50;

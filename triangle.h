@@ -37,6 +37,7 @@ triangle* triangle_create(vertex* v0, vertex* v1, vertex* v2,
 triangle* triangle_create2(vertex* v0, vertex* v1, vertex* v2);
 
 /*! Géométrie */
+int cote2d(const vertex* p1, const vertex* p2, const vertex* p);
 int dansTriangle2d(const triangle* t, const vertex* p);
 double triangle_vertical_distance(triangle* t, vertex* v);
 double ajouteCandidat(triangle* t, vertex* v);
@@ -54,7 +55,6 @@ void triangle_print2D(const triangle* t);
 //rapprochement point et indice
 int triangle_indice_point(const triangle* t, const vertex* p);
 int triangle_indice_voisin(const triangle* t, const triangle* voisin);
-
 
 //modifier indice triangle
 void rotationIndiceTriangle(triangle* t, const int rot);

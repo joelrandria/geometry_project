@@ -48,6 +48,12 @@ typedef struct _settings
 } settings;
 
 /**
+ * Alloue une instance de structure settings.
+ *
+ * @return Pointeur vers une instance non-initialisée de structure settings.
+ */
+settings* settings_alloc();
+/**
  * Initialise les paramètres de l'application à partir des arguments spécifiés en ligne de commande.
  *
  * @param argc Le nombre d'arguments de la ligne de commande.

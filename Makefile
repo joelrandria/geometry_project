@@ -4,7 +4,7 @@ OS = "unknown"
 
 # Add objectiveC library for MacOSX.
 ifneq ($(strip $(shell $(CC) -v 2>&1 | grep -i "Apple")),)
- GL_INCLUDE    = -I/usr/X11R6/include
+ GL_INCLUDE = -I/usr/X11R6/include
  GL_LIBRARIES = -framework OpenGL -framework GLUT
  BROWSER = dillo
  OS = "__APPLE__"
@@ -27,7 +27,11 @@ delaunay:	settings.o \
                 construction.o \
 		triangle.o \
                 pqueue.o \
-		tstack.o
+		tstack.o \
+		rendering.o \
+		vec3f.o \
+		transform.o \
+		camera.o
 
 	$(CC) $(GL_INCLUDE) $(GL_LIBDIR) \
 		settings.o \
@@ -37,9 +41,17 @@ delaunay:	settings.o \
 		triangle.o \
                 pqueue.o \
 		tstack.o \
+		rendering.o \
+		vec3f.o \
+		transform.o \
+		camera.o \
 	$(GL_LIBRARIES) -D$(OS) -o $@
 
 delaunay.o:	delaunay.c
+
+		$(CC) $(GL_INCLUDE) $(CFLAGS) -D$(OS) $<
+
+rendering.o:	rendering.c
 
 		$(CC) $(GL_INCLUDE) $(CFLAGS) -D$(OS) $<
 

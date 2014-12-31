@@ -1,24 +1,42 @@
 #include "construction.h"
 
+#include <stdio.h>
+
 void test(const int i)
 {
 	printf("test %d\n", i);
 }
 
-
 /**
  * retourne s'il n'y a plus de point à ajouter*/
-int insertPoint(pqueue* pq, const double goodness_of_fit, const int face)
+int insertPoint(pqueue* pq, settings* s)
 {
-	if(pq->items[1]->candidats == NULL)
-		return 0;
-	triangle* t = pqueue_dequeue(pq);
-	vertex* p = t->candidats;
-	tstack* pile = creerTroisTriangles(t, pq);
-	corrigeTriangles(pile, p, pq);
-	
-	//return (pq->items[1]->candidats != NULL);
-	return (pq->items[1]->distance_max > goodness_of_fit && (face ==-1 || face > pq->size));
+  if(pq->items[1]->candidats == NULL)
+    return (0);
+
+  switch (s->stop_mode)
+  {
+  case STOPMODE_FACE_COUNT:
+
+    if (pq->size >= s->max_face_count)
+      return (0);
+    break;
+
+  case STOPMODE_GOF:
+
+    // ToDo JRA: insertPoint(): Gestion du critère d'arrêt GoF
+    break;
+  }
+
+  triangle* t = pqueue_dequeue(pq);
+  vertex* p = t->candidats;
+  tstack* pile = creerTroisTriangles(t, pq);
+  corrigeTriangles(pile, p, pq);
+
+  //return (pq->items[1]->candidats != NULL);
+  //return (pq->items[1]->distance_max > goodness_of_fit && (face == -1 || face > pq->size));
+
+  return (1);
 }
 
 void initCarre(vertex* premier, pqueue* pq)
