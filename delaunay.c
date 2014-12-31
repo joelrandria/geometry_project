@@ -9,6 +9,7 @@
 #endif
 
 #include <time.h>
+#include <unistd.h>
 #include <stdio.h>
 
 /* int _point_count = 0; */
@@ -148,6 +149,8 @@ int main(int argc, char **argv)
 
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 0);
+	if(_settings->view_mode == VIEWMODE_3D)
+		glEnable(GL_DEPTH_TEST);
 
   glutMainLoop();
 
@@ -165,8 +168,8 @@ void on_idle_event()
 
   //printf("temps : %lf\n", (end-start)/((double)CLOCKS_PER_SEC));
 
-  /* if((end-start)/((double)CLOCKS_PER_SEC) < 0.016) */
-  /*   usleep(16000.0 - 1000000.0 * (end - start) / ((double)CLOCKS_PER_SEC)); */
+  if((end-start)/((double)CLOCKS_PER_SEC) < 0.016)
+     usleep(16000.0 - 1000000.0 * (end - start) / ((double)CLOCKS_PER_SEC));
 }
 
 /* void drawVertex(const vertex* v) */

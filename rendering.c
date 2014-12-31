@@ -94,19 +94,22 @@ static void render_2d(pqueue* p)
   glMatrixMode(GL_PROJECTION);
   gluOrtho2D(0, 1, 0, 1);
 
-  glColor3f(1, 1, 1);
-
-  for (i = 1; i <= p->size; ++i)
-  {
-    t = p->items[i];
-
-    glBegin(GL_LINE_LOOP);
-
-    for (j = 0; j < 3; ++j)
-      glVertex3f(t->s[j]->X, t->s[j]->Y, t->s[j]->Z);
-
-    glEnd();
-  }
+	vertex* v;
+	double val;
+	for (i = 1; i <= p->size; ++i)
+	{
+		t = p->items[i];
+		glBegin(GL_LINE_LOOP);
+		for (j = 0; j < 3; ++j)
+		{
+			v = t->s[j];
+			val = v->Z;		//(v->Z-_altitude_min)/(_altitude_max-_altitude_min);
+			//glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
+			glColor3f(0.600+val*0.40, 0.20+val*0.80, val);
+			glVertex2f(t->s[j]->X, t->s[j]->Y);
+		}
+		glEnd();
+	}
 }
 
 /**
@@ -120,6 +123,8 @@ static void render_3d(pqueue* p)
   int j;
 
   triangle* t;
+  vertex* v;
+  double val;
 
   GLdouble view_matrix[16];
 
@@ -132,22 +137,22 @@ static void render_3d(pqueue* p)
   glMatrixMode(GL_PROJECTION);
   gluPerspective(60.f, 1.f, 0.01f, 100.f);
 
-  glColor3f(1, 1, 1);
-
-  for (i = 1; i <= p->size; ++i)
-  {
-    t = p->items[i];
-
-    glBegin(GL_TRIANGLES);
-
-    for (j = 0; j < 3; ++j)
-    {
-      glVertex3f(t->s[j]->X, t->s[j]->Y, t->s[j]->Z);
-      glColor3f(t->s[j]->Z / 1.0f, t->s[j]->Z / 1.0f, t->s[j]->Z / 1.0f);
-    }
-
+	glBegin(GL_TRIANGLES);
+	for (i = 1; i <= p->size; ++i)
+	{
+		t = p->items[i];
+		/*if(	t->s[0]->X == 0.0 || t->s[1]->X == 0.0 || t->s[2]->X == 0.0 ||
+			t->s[0]->X == 1.0 || t->s[1]->X == 1.0 || t->s[2]->X == 1.0)
+				continue;*/
+		for (j = 0; j < 3; ++j)
+		{			
+			v = t->s[j];
+			val = v->Z;		//(v->Z-_altitude_min)/(_altitude_max-_altitude_min);
+			glColor3f(0.600+val*0.40, 0.20+val*0.80, val);
+			glVertex3f(t->s[j]->X, t->s[j]->Y, t->s[j]->Z);
+		}
+	}
     glEnd();
-  }
 }
 
 void render()
@@ -200,8 +205,12 @@ void process_specialkey_pressed(int key, int x, int y)
 
   switch (key)
   {
-  case GLUT_KEY_PAGE_UP: t = &_camera_up_move; break;
-  case GLUT_KEY_PAGE_DOWN: t = &_camera_down_move; break;
+  case GLUT_KEY_PAGE_UP: 
+  case GLUT_KEY_UP:			t = &_camera_up_move; break;
+  case GLUT_KEY_PAGE_DOWN: 
+  case GLUT_KEY_DOWN:		t = &_camera_down_move; break;
+  case GLUT_KEY_LEFT: 		t = &_camera_left_move; break;
+  case GLUT_KEY_RIGHT: 		t = &_camera_right_move; break;
   }
 
   if (t != 0)
