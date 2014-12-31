@@ -47,6 +47,10 @@ typedef struct _settings
   int max_face_count;
   /// Goodness Of Fit (paramètre du mode d'arrêt STOPMODE_GOF).
   float gof;
+  /// Booleen: affiche les triangles sur les bords (avec au moins 1 sommet sur le carré de base) si défini à vrai. 
+  int afficheBordure;
+  /// Booleen: en mode VIEWMODE_3D, met en evidence les bords des triangles par des lignes grises.
+  int afficheLine;
 
 } settings;
 

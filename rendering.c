@@ -23,7 +23,7 @@ static vec3f _camera_left_move = {-0.05f, 0, 0};
 static vec3f _camera_up_move = {0, 0.05f, 0};
 static vec3f _camera_down_move = {0, -0.05f, 0};
 
-static const float _camera_degree_rotamount = 0.1f;
+static const float _camera_degree_rotamount = 0.5f;
 
 /**
  * Initialise la caméra globale si celle-ci ne l'est pas encore.
@@ -100,26 +100,29 @@ static void camera_get_modelview_matrix(camera* c, GLdouble m[16])
  */
 static void render_2d(pqueue* p)
 {
-  int i;
-  int j;
+  int i, j;
   triangle* t;
 
   glMatrixMode(GL_PROJECTION);
   gluOrtho2D(0, 1, 0, 1);
 
 	vertex* v;
-	double val;
+	float val;
 	for (i = 1; i <= p->size; ++i)
 	{
 		t = p->items[i];
+		if(!_settings->afficheBordure)
+			if(	t->s[0]->X == 0.0 || t->s[1]->X == 0.0 || t->s[2]->X == 0.0 ||
+				t->s[0]->X == 1.0 || t->s[1]->X == 1.0 || t->s[2]->X == 1.0)
+					continue;
 		glBegin(GL_LINE_LOOP);
 		for (j = 0; j < 3; ++j)
 		{
 			v = t->s[j];
-			val = v->Z;		//(v->Z-_altitude_min)/(_altitude_max-_altitude_min);
+			val = v->Z/_settings->altitude_max;		//(v->Z-_altitude_min)/(_altitude_max-_altitude_min);
 			//glColor3f(0.625+val*0.375, 0.25+val*0.75, val);
-			glColor3f(0.600+val*0.40, 0.20+val*0.80, val);
-			glVertex2f(t->s[j]->X, t->s[j]->Y);
+			glColor3f(0.600f+val*0.40f, 0.20f+val*0.80f, val);
+			glVertex2f(v->X, v->Y);
 		}
 		glEnd();
 	}
@@ -132,12 +135,11 @@ static void render_2d(pqueue* p)
  */
 static void render_3d(pqueue* p)
 {
-  int i;
-  int j;
+  int i, j;
 
   triangle* t;
   vertex* v;
-  double val;
+  float val;
 
   GLdouble view_matrix[16];
 
@@ -150,25 +152,39 @@ static void render_3d(pqueue* p)
   glLoadMatrixd(view_matrix);
 
   glMatrixMode(GL_PROJECTION);
-  gluPerspective(60.f, 1.f, 0.001f, 10.f);
-  
-  glBegin(GL_TRIANGLES);
+  gluPerspective(60.f, 1.f, 0.01f, 10.f);
 
-  for (i = 1; i <= p->size; ++i)
-  {
-    t = p->items[i];
+	for (i = 1; i <= p->size; ++i)
+	{
+		t = p->items[i];
 
-    for (j = 0; j < 3; ++j)
-    {
-      v = t->s[j];
-      val = v->Z;
-
-      glColor3f(0.600+val*0.40, 0.20+val*0.80, val);
-      glVertex3f(t->s[j]->X, t->s[j]->Y, t->s[j]->Z);
-    }
-  }
-
-  glEnd();
+		if(!_settings->afficheBordure)
+			if(	t->s[0]->X == 0.0 || t->s[1]->X == 0.0 || t->s[2]->X == 0.0 ||
+				t->s[0]->X == 1.0 || t->s[1]->X == 1.0 || t->s[2]->X == 1.0)
+					continue;
+		
+		glBegin(GL_TRIANGLES);
+		for (j = 0; j < 3; ++j)
+		{
+			v = t->s[j];
+			val = v->Z/_settings->altitude_max;
+			glColor3f(0.600f+val*0.40f, 0.20f+val*0.80f, val);
+			glVertex3f(v->X, v->Y, v->Z);
+		}
+		glEnd();
+		
+		if(_settings->afficheLine)
+		{
+			glColor3f(0.5f, 0.5f, 0.5f);
+			glBegin(GL_LINE_LOOP);
+			for (j = 0; j < 3; ++j)
+			{
+				v = t->s[j];
+				glVertex3f(v->X, v->Y, v->Z);
+			}
+			glEnd();
+		}
+	}
 }
 
 void render()
@@ -214,6 +230,8 @@ void process_key_pressed(unsigned char key, int x, int y)
   case '/': glDisable(GL_DEPTH_TEST); printf("GL_DEPTH_TEST disabled\r\n"); break;
 
   case ' ': _settings->view_mode = (_settings->view_mode == VIEWMODE_3D ? VIEWMODE_2D : VIEWMODE_3D); break;
+  case 'b': _settings->afficheBordure = !_settings->afficheBordure;	break;
+  case 'l': _settings->afficheLine = !_settings->afficheLine;	break;
   }
 
   if (t != 0)

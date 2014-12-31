@@ -164,13 +164,12 @@ void on_idle_event()
 {
   clock_t start = clock();
   render();
-  //draw();
   clock_t end = clock();
 
   //printf("temps : %lf\n", (end-start)/((double)CLOCKS_PER_SEC));
 
-  if((end-start)/((double)CLOCKS_PER_SEC) < 0.016)
-     usleep(16000.0 - 1000000.0 * (end - start) / ((double)CLOCKS_PER_SEC));
+  if((end-start)/((double)CLOCKS_PER_SEC) < 0.020)	//60 FPS
+     usleep(20000.0 - 1000000.0 * (end - start) / ((double)CLOCKS_PER_SEC));
 }
 
 void drawVertex(const vertex* v)
