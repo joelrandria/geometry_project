@@ -7,6 +7,8 @@
 
 #include "vertex.h"
 
+#define HAUTEUR_DEFAUT -1.0
+
 /**
  * Définit un triangle du maillage. Encapsule les informations locales d'un simplex triangle et encapsule l'ensemble de sommets n'appartenant pas au maillage, se projetant verticalement sur celui-ci.
  */

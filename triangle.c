@@ -16,7 +16,7 @@ void triangle_init(triangle* t,
 	t->v[2] = voisin2;
 
 	t->candidats = NULL;
-	t->distance_max = 0;
+	t->distance_max = HAUTEUR_DEFAUT;
 
 	t->queue_pos = 0;
 }
@@ -100,7 +100,7 @@ double triangle_vertical_distance(triangle* t, vertex* v)
 
   vProjZ = (((t->s[0]->X - v->X) * nX) + ((t->s[0]->Y - v->Y) * nY) + (t->s[0]->Z * nZ)) / nZ;
 
-  return (fabs(v->Z - vProjZ));
+  return v->Z-vProjZ;//(fabs(v->Z - vProjZ));
 }
 
 /**le triangle a déjà au moins ses trois sommets comme candidats*/

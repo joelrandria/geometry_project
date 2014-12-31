@@ -135,7 +135,7 @@ static void render_3d(pqueue* p)
   glLoadMatrixd(view_matrix);
 
   glMatrixMode(GL_PROJECTION);
-  gluPerspective(60.f, 1.f, 0.01f, 100.f);
+  gluPerspective(60.f, 1.f, 0.1f, 100.f);
 
 	glBegin(GL_TRIANGLES);
 	for (i = 1; i <= p->size; ++i)

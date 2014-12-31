@@ -33,6 +33,7 @@ int insertPoint(pqueue* pq, settings* s)
   tstack* pile = creerTroisTriangles(t, pq);
   corrigeTriangles(pile, p, pq);
 
+	//printf("distance : %lf\n", t->distance_max);
   //return (pq->items[1]->candidats != NULL);
   //return (pq->items[1]->distance_max > goodness_of_fit && (face == -1 || face > pq->size));
 
@@ -101,7 +102,7 @@ tstack* creerTroisTriangles(triangle* t, pqueue* pq)
 	triangle** tgls = (triangle**) malloc(sizeof(triangle*)*3);
 	vertex* v = t->candidats;
 	t->candidats = NULL;
-	t->distance_max = 0.0;
+	t->distance_max = HAUTEUR_DEFAUT;
 	 
 	tgls[0] = triangle_create(t->s[0], t->s[1], v, NULL, t, t->v[2]);
 	tgls[1] = triangle_create(v, t->s[1], t->s[2], t->v[0], t, tgls[0]);
@@ -185,8 +186,8 @@ void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 		}
 		t1->candidats = NULL;
 		t2->candidats = NULL;
-		t1->distance_max = 0.0;
-		t2->distance_max = 0.0;
+		t1->distance_max = HAUTEUR_DEFAUT;
+		t2->distance_max = HAUTEUR_DEFAUT;
 		//on fait tourner les indices de triangle pour que ce soit plus facile après, avec 0 qui sera le point opposé de chaque côté.
 		rotationIndiceTriangle(t1, i1);
 		//swapIndiceTriangle(t1, 0, i1);

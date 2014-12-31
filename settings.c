@@ -27,7 +27,7 @@ static void settings_reset(settings* s)
 
   s->stop_mode = STOPMODE_NONE;
   s->max_face_count = 0;
-  s->gof = 0;
+  s->gof = -1.0;
 }
 void settings_from_cmdline(int argc, char** argv, settings* s)
 {
