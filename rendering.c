@@ -143,6 +143,8 @@ static void render_3d(pqueue* p)
 
   camera_initialize();
 
+  glEnable(GL_DEPTH_TEST);
+
   glMatrixMode(GL_MODELVIEW);
   camera_get_modelview_matrix(_camera, view_matrix);
   glLoadMatrixd(view_matrix);
