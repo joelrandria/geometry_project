@@ -1,6 +1,7 @@
 /**
  * @file   settings.h
  * @brief  Types et structures de données relatifs aux paramètres d'exécution de l'application.
+ * @author Argoud Aurélien et Joel Randria
  */
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__

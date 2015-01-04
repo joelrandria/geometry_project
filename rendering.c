@@ -180,7 +180,7 @@ static void render_3d(pqueue* p)
 			for (j = 0; j < 3; ++j)
 			{
 				v = t->s[j];
-				glVertex3f(v->X, v->Y, v->Z);
+				glVertex3f(v->X, v->Y, v->Z+0.001);
 			}
 			glEnd();
 		}

@@ -9,7 +9,7 @@ void test(const int i)
 
 /**
  * retourne s'il n'y a plus de point à ajouter*/
-int insertPoint(pqueue* pq, settings* s)
+int insertPoint(pqueue* pq, tstack* pile, settings* s)
 {
   if(pq->items[1]->candidats == NULL)
     return (0);
@@ -22,14 +22,15 @@ int insertPoint(pqueue* pq, settings* s)
     break;
 
   case STOPMODE_GOF:
-
+	if (pq->items[1]->distance_max < (1-s->gof)*s->altitude_max)
+		return (0);
     // ToDo JRA: insertPoint(): Gestion du critère d'arrêt GoF
     break;
   }
 
   triangle* t = pqueue_dequeue(pq);
   vertex* p = t->candidats;
-  tstack* pile = creerTroisTriangles(t, pq);
+  creerTroisTriangles(t, pq, pile);
   corrigeTriangles(pile, p, pq);
 
 	//printf("distance : %lf\n", t->distance_max);
@@ -96,7 +97,7 @@ void repartageCandidats(triangle** tgls, const int nbTriangles, vertex* candid)
 }
 
 /**créer trois triangles en découpant un triangle par son premier candidat*/
-tstack* creerTroisTriangles(triangle* t, pqueue* pq)
+void creerTroisTriangles(triangle* t, pqueue* pq, tstack* pile)
 {	
 	triangle** tgls = (triangle**) malloc(sizeof(triangle*)*3);
 	vertex* v = t->candidats;
@@ -134,14 +135,12 @@ tstack* creerTroisTriangles(triangle* t, pqueue* pq)
 	pqueue_enqueue(pq, tgls[0]);
 	pqueue_enqueue(pq, tgls[1]);
 	pqueue_enqueue(pq, tgls[2]);
-	pqueue_update_triangle(pq,t);
+	//pqueue_update_triangle(pq,t);
 	
-	tstack* pile = NULL;
-	pile = tstack_push(pile, tgls[0]);
-	pile = tstack_push(pile, tgls[1]);
-	pile = tstack_push(pile, tgls[2]);
+	tstack_push(pile, tgls[0]);
+	tstack_push(pile, tgls[1]);
+	tstack_push(pile, tgls[2]);
 	free(tgls);
-	return pile;
 }
 
 
@@ -149,10 +148,9 @@ tstack* creerTroisTriangles(triangle* t, pqueue* pq)
 
 void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 {
-	while(pile != NULL)
+	while(pile->nb != 0)
 	{
-		triangle* t1;
-		pile = tstack_pop(pile, &t1);
+		triangle* t1 = tstack_pop(pile);
 		
 		int i1 = triangle_indice_point(t1, p);
 		
@@ -165,24 +163,11 @@ void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 		
 		//il ne faut pas que le quadrilatère formé par les deux triangles soit non-convexe (avec un angle de plus de 180°)
 		//swapIndiceTriangle(t1, 1, i1);
-		if(cote2d(t1->s[i1], t2->s[i2], t1->s[(i1+1)%3]) == cote2d(t1->s[i1], t2->s[i2], t1->s[(i1+2)%3]))
-			continue;
+		//if(cote2d(t1->s[i1], t2->s[i2], t1->s[(i1+1)%3]) == cote2d(t1->s[i1], t2->s[i2], t1->s[(i1+2)%3]))
+		//	continue;
 		if(!triangleInCircle(t1, p2))
 			continue;
-		vertex* candid = t1->candidats;
-		if(candid == NULL)
-			candid = t2->candidats;
-		else
-		{
-			const int candidat = VLINK_CANDIDAT,	suiv = VLINK_FORWARD;
-			vertex* v = candid, *suivant = candid->link[candidat][suiv];
-			while(suivant != NULL)
-			{
-				v = suivant;
-				suivant = v->link[candidat][suiv];
-			}
-			v->link[candidat][suiv] = t2->candidats;
-		}
+		vertex* candid = t1->candidats, *candid2 = t2->candidats;
 		t1->candidats = NULL;
 		t2->candidats = NULL;
 		t1->distance_max = HAUTEUR_DEFAUT;
@@ -221,9 +206,10 @@ void corrigeTriangles(tstack* pile, vertex* p, pqueue* pq)
 		tgls[0] = t1;
 		tgls[1] = t2;
 		repartageCandidats(tgls, 2, candid);
+		repartageCandidats(tgls, 2, candid2);
 		free(tgls);
-		pile = tstack_push(pile, t1);
-		pile = tstack_push(pile, t2);
+		tstack_push(pile, t1);
+		tstack_push(pile, t2);
 		pqueue_update_triangle(pq,t1);
 		pqueue_update_triangle(pq,t2);
 		pqueue_update_triangle(pq,t1);

@@ -1,6 +1,7 @@
 /**
  * @file   pqueue.h
  * @brief File de priorité de triangles basée sur leurs distances respectives à leurs sommets respectifs.
+ * @author Argoud Aurélien et Joel Randria
  */
 #ifndef __PQUEUE_H__
 #define __PQUEUE_H__

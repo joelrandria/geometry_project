@@ -29,6 +29,7 @@ int _line = 0;
 
 /*! Initialisation des variables externes. */
 pqueue* _queue = NULL;
+tstack* _stack = NULL;
 settings* _settings = NULL;
 
 double myRandom(double a, double b)
@@ -62,42 +63,12 @@ vertex* create_random_points(settings* s)
   vertex* dernier = v;
 
   int i;
-  /* int cmp; */
-  /* vertex* v2 = v; */
   for (i = 4; i < _settings->vertex_count; ++i)
   {
-    /* if (_sans_echec) */
-    /*   v = vertex_create(0, 0, myRandom(0, s->altitude_max)); */
-    /* else */
       v = vertex_create(myRandom(0, 1), myRandom(0, 1), myRandom(0, s->altitude_max));
 
     dernier->link[naturel][suiv] = v;
     dernier = v;
-
-    /* if(_sans_echec) */
-    /* { */
-    /*   do */
-    /*   { */
-    /* 	v->X = myRandom(0, 1), */
-    /* 	  v->Y = myRandom(0, 1); */
-
-    /* 	vPrec = premier; */
-    /* 	v2= vPrec->link[lexico][suiv]; */
-    /* 	while(v2 != NULL && (cmp = lexico_cmp(v2, v))== -1) */
-    /* 	{ */
-    /* 	  vPrec = v2; */
-    /* 	  v2 = v2->link[lexico][suiv]; */
-    /* 	} */
-
-    /* 	if(cmp != 0)	//si le vertex(x,y) n'est pas déjà dans la chaine	(-1 => v2==NULL) */
-    /* 	{ */
-    /* 	  vPrec->link[lexico][suiv] = v; */
-    /* 	  v->link[lexico][suiv] = v2; */
-    /* 	} */
-    /* 	//else: il faut changer les valeurs du vertex. */
-    /*   } */
-    /*   while(cmp == 0);	//tant que le vertex à les mêmes coordonnées (x,y) qu'un autre point */
-    /* } */
   }
 
   printf("fin de création des points.\n");
@@ -105,8 +76,12 @@ vertex* create_random_points(settings* s)
   return premier;
 }
 
+#define MIN(a, b)	(a < b	?	a	:	b)
+
 int main(int argc, char **argv)
 {
+	clock_t start = clock();
+  
   _settings = settings_alloc();
   settings_from_cmdline(argc, argv, _settings);
 
@@ -125,37 +100,30 @@ int main(int argc, char **argv)
 
   vertex* premier = create_random_points(_settings);
 
-  _queue = pqueue_create((2 * _settings->vertex_count) - 6);
-
+	//crée une priority_queue et une pile de grande taille pour acceuillir tous les triangles.
+	const int taille2 = (2 * _settings->vertex_count - 6);
+	const int taille = (_settings->stop_mode == STOPMODE_FACE_COUNT ? 
+							MIN(taille2, _settings->max_face_count+3)	:	
+							taille2);
+	_queue = pqueue_create(taille);
+	_stack = tstack_create(taille);
+	
   initCarre(premier, _queue);
 
-  /* if(_ins == -1) */
-  /* { */
-  /*   while(insertPoint(_queue, _goodness_of_fit, _face)); */
-  /* } */
-  /* else */
-  /* { */
-  /*   for(int i = 0; i < _ins; i++) */
-  /*   { */
-  /*     if (!insertPoint(_queue, _goodness_of_fit, _face) && i != _ins - 1) */
-  /*     { */
-  /* 	printf("nombre d'insertion donnée par -i trop élevé.\n"); */
-  /* 	break; */
-  /*     } */
-  /*   } */
-  /* } */
-
-  while(insertPoint(_queue, _settings));
+  while(insertPoint(_queue, _stack, _settings));
 
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 0);
 	if(_settings->view_mode == VIEWMODE_3D)
 		glEnable(GL_DEPTH_TEST);
 
+	
+  printf("fin de génération de la triangulation!\n\tTemps : %lf s\n\tTaille max atteinte dans la pile : %d\n", (clock()-start)/((double)CLOCKS_PER_SEC), _stack->nbMaxAtteint );
   glutMainLoop();
 
   vertex_delete(premier, VLINK_NATURAL);
   pqueue_delete(_queue);
+  tstack_delete(_stack);
 
   return EXIT_SUCCESS;
 }
@@ -167,7 +135,6 @@ void on_idle_event()
   clock_t end = clock();
 
   //printf("temps : %lf\n", (end-start)/((double)CLOCKS_PER_SEC));
-
   if((end-start)/((double)CLOCKS_PER_SEC) < 0.020)	//60 FPS
      usleep(20000.0 - 1000000.0 * (end - start) / ((double)CLOCKS_PER_SEC));
 }

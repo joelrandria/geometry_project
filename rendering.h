@@ -1,6 +1,7 @@
 /**
  * @file   rendering.h
  * @brief  Prend en charge les différents modes de rendu du terrain.
+ * @author Argoud Aurélien et Joel Randria
  */
 #ifndef __RENDERING_H__
 #define __RENDERING_H__

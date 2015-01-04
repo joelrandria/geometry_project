@@ -1,3 +1,9 @@
+/**
+ * @file   vertex.h
+ * @brief  structure de point.
+ * @author Argoud Aurélien et Joel Randria
+ */
+
 #ifndef __VERTEX_H__
 #define __VERTEX_H__
 

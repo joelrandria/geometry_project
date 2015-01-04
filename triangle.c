@@ -39,9 +39,6 @@ triangle* triangle_create2(vertex* v0, vertex* v1, vertex* v2)
   return triangle_create(v0, v1, v2, NULL, NULL, NULL);
 }
 
-#define ALIGNE 0x11
-#define GAUCHE 0x01
-#define DROITE 0x10
 int cote2d(const vertex* p1, const vertex* p2, const vertex* p)
 {
 	if(equal2d(p1,p2) || equal2d(p1,p) || equal2d(p2,p))
@@ -103,7 +100,6 @@ double triangle_vertical_distance(triangle* t, vertex* v)
   return fabs(v->Z-vProjZ);//(fabs(v->Z - vProjZ));
 }
 
-/**le triangle a déjà au moins ses trois sommets comme candidats*/
 double ajouteCandidat(triangle* t, vertex* v)
 {
 	const int candidat = VLINK_CANDIDAT, suiv = VLINK_FORWARD;
