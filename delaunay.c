@@ -110,7 +110,9 @@ int main(int argc, char **argv)
 	
   initCarre(premier, _queue);
 
-  while(insertPoint(_queue, _stack, _settings));
+	int nbIteration = 0;
+	while(insertPoint(_queue, _stack, _settings))
+		nbIteration++;
 
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   glClearColor(0, 0, 0, 0);
@@ -118,7 +120,7 @@ int main(int argc, char **argv)
 		glEnable(GL_DEPTH_TEST);
 
 	
-  printf("fin de génération de la triangulation!\n\tTemps : %lf s\n\tTaille max atteinte dans la pile : %d\n", (clock()-start)/((double)CLOCKS_PER_SEC), _stack->nbMaxAtteint );
+  printf("fin de génération de la triangulation!\n\tTemps : %lf s\n\tNombre de face : %d\n\tNombre de candidats insérés : %d\n\tTaille max atteinte dans la pile : %d\n", (clock()-start)/((double)CLOCKS_PER_SEC), _queue->size, nbIteration,_stack->nbMaxAtteint );
   glutMainLoop();
 
   vertex_delete(premier, VLINK_NATURAL);
